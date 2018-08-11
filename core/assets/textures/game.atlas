@@ -1,19 +1,39 @@
 
 game.png
+size: 128,128
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+buildings/cottage
+  rotate: false
+  xy: 2, 2
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+
+game2.png
 size: 128,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-tiles/border
+tiles/blank
   rotate: false
   xy: 2, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-tiles/grass
+tiles/border
   rotate: false
   xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+tiles/grass
+  rotate: false
+  xy: 70, 2
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

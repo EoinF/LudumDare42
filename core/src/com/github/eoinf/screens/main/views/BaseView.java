@@ -4,38 +4,37 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.github.eoinf.TextureManager;
 import com.github.eoinf.utils;
 
 public abstract class BaseView {
-
     Stage stage;
     FitViewport viewport;
     OrthographicCamera camera;
-    Skin skin;
+    TextureManager textureManager;
 
     protected Table rootTable;
 
     public BaseView(int startX, int startY, int width, int height,
-                    Batch batch, Skin skin,
+                    Batch batch, TextureManager textureManager,
                     float viewportWidth, float viewportHeight) {
         this.camera = new OrthographicCamera(viewportWidth, viewportHeight);
         this.viewport = new FitViewport(viewportWidth, viewportHeight, camera);
         this.stage = new Stage(viewport, batch);
-        this.skin = skin;
+        this.textureManager = textureManager;
         initRootTable(startX, startY, width, height);
     }
 
     public BaseView(int startX, int startY, int width, int height,
-                    Batch batch, Skin skin,
+                    Batch batch, TextureManager textureManager,
                     float viewportWidth, float viewportHeight,
                     Color colour) {
         this.camera = new OrthographicCamera(viewportWidth, viewportHeight);
         this.viewport = new FitViewport(viewportWidth, viewportHeight, camera);
         this.stage = new Stage(viewport, batch);
-        this.skin = skin;
+        this.textureManager = textureManager;
         initRootTable(startX, startY, width, height, colour);
     }
 
