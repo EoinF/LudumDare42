@@ -1,11 +1,15 @@
-package com.github.eoinf.screens.main;
+package com.github.eoinf.screens.main.views;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.github.eoinf.screens.main.views.Infobar;
-import com.github.eoinf.screens.main.views.MainView;
-import com.github.eoinf.screens.main.views.Sidebar;
+import com.github.eoinf.TextureManager;
+import com.github.eoinf.game.GameMap;
+import com.github.eoinf.game.MapTile;
+import com.github.eoinf.screens.main.controllers.GameScreenController;
+
+import java.util.function.Consumer;
 
 public class GameScreen implements Screen {
 
@@ -13,15 +17,22 @@ public class GameScreen implements Screen {
     Sidebar sidebar;
     Infobar infoBar;
 
-    private static final int SIDEBAR_WIDTH = 250;
-    private static final int INFO_BAR_WIDTH = 400;
+    GameMap gameMap;
+    GameScreenController gameScreenController;
+
+    private static final int SIDEBAR_WIDTH = 256;
+    private static final int INFO_BAR_WIDTH = 416;
     private static final int INFO_BAR_HEIGHT = 50;
+    private static final int TILE_WIDTH = 32;
+    private static final int TILE_HEIGHT = 32;
 
 
-    public GameScreen(int viewportWidth, int viewportHeight, Batch batch, Skin skin) {
+    public GameScreen(int viewportWidth, int viewportHeight, Batch batch, Skin skin, TextureManager textureManager) {
+        this.gameMap = new GameMap(32, 30, TILE_WIDTH, TILE_HEIGHT);
+        this.gameScreenController = new GameScreenController();
         this.mainView = new MainView(SIDEBAR_WIDTH, 0, viewportWidth, viewportHeight,
                 batch, skin,
-                viewportWidth, viewportHeight);
+                viewportWidth, viewportHeight, textureManager);
         this.sidebar = new Sidebar(0, 0, SIDEBAR_WIDTH, viewportHeight,
                 batch, skin,
                 viewportWidth, viewportHeight);
@@ -29,6 +40,15 @@ public class GameScreen implements Screen {
                 INFO_BAR_WIDTH, INFO_BAR_HEIGHT,
                 batch, skin,
                 viewportWidth, viewportHeight);
+
+        this.mainView.setMap(gameMap);
+
+        gameScreenController.subscribeOnChangeTile(new Consumer<MapTile>(){
+            @Override
+            public void accept(MapTile tile) {
+                mainView.updateTile(tile);
+            }
+        });
     }
 
     @Override
@@ -45,8 +65,8 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         update(delta);
-        infoBar.render();
         mainView.render();
+        infoBar.render();
         sidebar.render();
     }
 
