@@ -1,12 +1,14 @@
 package com.github.eoinf.screens.main.views;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.MapTile;
+import com.github.eoinf.game.Player;
 import com.github.eoinf.screens.main.controllers.GameScreenController;
 
 import java.util.function.Consumer;
@@ -26,9 +28,13 @@ public class GameScreen implements Screen {
     private static final int TILE_WIDTH = 32;
     private static final int TILE_HEIGHT = 32;
 
-
     public GameScreen(int viewportWidth, int viewportHeight, Batch batch, Skin skin, TextureManager textureManager) {
-        this.gameMap = new GameMap(32, 30, TILE_WIDTH, TILE_HEIGHT);
+
+        Player[] players = new Player[2];
+        players[0] = new Player(0, Color.BLUE);
+        players[1] = new Player(1, Color.RED);
+
+        this.gameMap = new GameMap(32, 25, TILE_WIDTH, TILE_HEIGHT, players);
         this.gameScreenController = new GameScreenController();
         this.mainView = new MainView(SIDEBAR_WIDTH, 0, viewportWidth, viewportHeight,
                 batch, skin,
@@ -41,6 +47,7 @@ public class GameScreen implements Screen {
                 batch, skin,
                 viewportWidth, viewportHeight);
 
+        this.mainView.setPlayers(players);
         this.mainView.setMap(gameMap);
 
         gameScreenController.subscribeOnChangeTile(new Consumer<MapTile>(){

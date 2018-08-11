@@ -5,12 +5,25 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.MapTile;
+import com.github.eoinf.game.Player;
 
 public class MapTileActor extends Group {
-    public MapTileActor(TextureManager textureManager, MapTile tile) {
+    public MapTileActor(TextureManager textureManager, MapTile tile, Player[] players) {
         Image background = new Image(textureManager.tiles.grass);
         Image border = new Image(textureManager.tiles.border);
-        border.setColor(Color.BLACK);
+
+        Color borderColour = new Color(0.1f, 0.1f, 0.1f, 1);
+        if (tile.getOwnerId() != MapTile.NO_OWNER) {
+            for (Player player: players) {
+                if (player.getId() == tile.getOwnerId()) {
+                    borderColour = player.getColour();
+                    break;
+                }
+            }
+        }
+        borderColour = borderColour.cpy();
+        borderColour.a = 0.5f;
+        border.setColor(borderColour);
 
         addActor(background);
         addActor(border);
