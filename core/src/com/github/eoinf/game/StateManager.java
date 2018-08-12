@@ -15,7 +15,7 @@ import static com.github.eoinf.game.StateManager.State.PRODUCTION_PHASE;
 public class StateManager {
     private GameMap gameMap;
     private Player[] players;
-    private List<ConstructedBuilding> buildings;
+    private List<PlacedBuilding> buildings;
 
 
     private Set<Integer> playerIdTurnEnded;
@@ -34,7 +34,7 @@ public class StateManager {
         return this.state;
     }
 
-    public List<ConstructedBuilding> getBuildings() {
+    public List<PlacedBuilding> getBuildings() {
         return buildings;
     }
 
@@ -46,7 +46,7 @@ public class StateManager {
         PRODUCTION_PHASE
     }
 
-    public StateManager(Player[] players, GameMap gameMap, List<ConstructedBuilding> buildings,
+    public StateManager(Player[] players, GameMap gameMap, List<PlacedBuilding> buildings,
                         GameScreenController gameScreenController) {
         this.players = players;
         this.gameMap = gameMap;
@@ -58,9 +58,17 @@ public class StateManager {
         gameScreenController.subscribeOnSetState(new Consumer<State>() {
             @Override
             public void accept(State nextState) {
-                // Leaving the planning phase (All players hit end turn)
-                if (state != nextState && state == PLANNING_PHASE) {
-                    playerIdTurnEnded.clear();
+                if (state != nextState) {
+                    if (state == PLANNING_PHASE) {
+                        // Leaving the planning phase (All players hit end turn)
+                        playerIdTurnEnded.clear();
+                    } else if (nextState == PLANNING_PHASE) {
+                        // Entering the planning phase
+                        for (Player player: players) {
+                            player.calculateNextResources(buildings);
+                            gameScreenController.changePlayer(player);
+                        }
+                    }
                 }
                 state = nextState;
             }
@@ -102,9 +110,14 @@ public class StateManager {
         for (Player player : this.players) {
             player.resetResourceUsage();
 
-            for (ConstructedBuilding building : buildings) {
-                if (player.getId() == building.getOwner()) {
-                    building.getBuilding().getEffect().applyTo(player);
+            for (PlacedBuilding building : buildings) {
+                if (building.isConstructed()) {
+                    if (player.getId() == building.getOwner()) {
+                        building.getBuilding().getEffect().applyTo(player);
+                    }
+                } else {
+                    building.setIsConstructed(true);
+                    gameScreenController.changeBuilding(building);
                 }
             }
             player.collectNewResources();

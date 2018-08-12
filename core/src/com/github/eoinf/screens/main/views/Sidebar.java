@@ -1,5 +1,6 @@
 package com.github.eoinf.screens.main.views;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -21,6 +22,7 @@ import com.github.eoinf.screens.main.widgets.BuildingCategory;
 import com.github.eoinf.screens.main.widgets.BuildingsTable;
 import com.github.eoinf.screens.main.widgets.ProductionTable;
 import com.github.eoinf.screens.main.widgets.UnitsTable;
+import org.lwjgl.input.Mouse;
 
 import java.util.Map;
 
@@ -73,6 +75,8 @@ public class Sidebar extends BaseView {
                 buildingsTable.setVisible(buildingsTableButton.isChecked());
                 productionTable.setVisible(productionTableButton.isChecked());
                 unitsTable.setVisible(unitsTableButton.isChecked());
+
+                gameScreenController.setSelectedBuilding(null);
             }
         };
 
@@ -80,16 +84,26 @@ public class Sidebar extends BaseView {
         productionTableButton.addListener(onClickModeButton);
         unitsTableButton.addListener(onClickModeButton);
 
-        stage.addListener(new ClickListener() {
+        // Left clicks
+        stage.addListener(new ClickListener(Input.Buttons.LEFT) {
                               @Override
-                              public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                                  System.out.println("touch down");
+                              public void clicked(InputEvent event, float x, float y) {
                                   Actor hit = stage.hit(x, y, true);
 
                                   if (hit instanceof BuildingActor) {
                                       gameScreenController.setSelectedBuilding((Building) hit.getUserObject());
                                   }
-                                  return super.touchDown(event, x, y, pointer, button);
+                                  super.clicked(event, x, y);
+                              }
+                          }
+        );
+
+        // Right clicks
+        stage.addListener(new ClickListener(Input.Buttons.RIGHT) {
+                              @Override
+                              public void clicked(InputEvent event, float x, float y) {
+                                  gameScreenController.setSelectedBuilding(null);
+                                  super.clicked(event, x, y);
                               }
                           }
         );

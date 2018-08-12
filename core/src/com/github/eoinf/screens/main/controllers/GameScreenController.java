@@ -1,8 +1,7 @@
 package com.github.eoinf.screens.main.controllers;
 
-import com.badlogic.gdx.math.GridPoint2;
 import com.github.eoinf.game.Building;
-import com.github.eoinf.game.ConstructedBuilding;
+import com.github.eoinf.game.PlacedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.MapTile;
 import com.github.eoinf.game.Player;
@@ -21,10 +20,11 @@ public class GameScreenController {
         this.players = players;
         this.mapTileObservers = new ArrayList<>();
         this.selectedBuildingObservers = new ArrayList<>();
-        this.constructBuildingObservers = new ArrayList<>();
+        this.placeBuildingObservers = new ArrayList<>();
         this.stateObservers = new ArrayList<>();
         this.playerObservers = new ArrayList<>();
         this.endTurnObservers = new ArrayList<>();
+        this.changeBuildingObservers = new ArrayList<>();
     }
 
     //
@@ -58,15 +58,15 @@ public class GameScreenController {
     }
 
     //
-    // Construct building
+    // Place new building
     //
-    private List<Consumer<ConstructedBuilding>> constructBuildingObservers;
+    private List<Consumer<PlacedBuilding>> placeBuildingObservers;
 
-    public void subscribeOnConstructBuilding(Consumer<ConstructedBuilding> onConstructBuilding) {
-        this.constructBuildingObservers.add(onConstructBuilding);
+    public void subscribeOnPlaceBuilding(Consumer<PlacedBuilding> onPlaceBuilding) {
+        this.placeBuildingObservers.add(onPlaceBuilding);
     }
 
-    public boolean constructBuilding(Building building, MapTile originTile, int owner) {
+    public boolean placeBuilding(Building building, MapTile originTile, int owner) {
         int tileX = originTile.getX();
         int tileY = originTile.getY();
         Player player = null;
@@ -78,11 +78,11 @@ public class GameScreenController {
         }
         if (gameMap.canConstructBuilding(building, tileX, tileY, owner)
                 && player.canConstructBuilding(building)) {
-            System.out.println("Constructing building: " + building.getName() + " at " + tileX + ", " + tileY
+            System.out.println("Placing building: " + building.getName() + " at " + tileX + ", " + tileY
                     + " for player " + owner);
             List<MapTile> buildingTiles = gameMap.getBuildingTiles(building, tileX, tileY);
-            for (Consumer<ConstructedBuilding> observer : constructBuildingObservers) {
-                observer.accept(new ConstructedBuilding(building, originTile, buildingTiles, owner));
+            for (Consumer<PlacedBuilding> observer : placeBuildingObservers) {
+                observer.accept(new PlacedBuilding(building, originTile, buildingTiles, owner, false));
             }
             return true;
         }
@@ -135,6 +135,18 @@ public class GameScreenController {
         System.out.println("Ending turn for player " + playerId);
         for (Consumer<Integer> observer : endTurnObservers) {
             observer.accept(playerId);
+        }
+    }
+    //
+    // Change building
+    //
+    private List<Consumer<PlacedBuilding>> changeBuildingObservers;
+    public void subscribeOnChangeBuilding(Consumer<PlacedBuilding> onChangeBuilding) {
+        this.changeBuildingObservers.add(onChangeBuilding);
+    }
+    public void changeBuilding(PlacedBuilding building) {
+        for (Consumer<PlacedBuilding> observer : changeBuildingObservers) {
+            observer.accept(building);
         }
     }
 }

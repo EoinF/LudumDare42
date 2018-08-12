@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.AIController;
 import com.github.eoinf.game.Building;
-import com.github.eoinf.game.ConstructedBuilding;
+import com.github.eoinf.game.PlacedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.Player;
 import com.github.eoinf.game.StateManager;
@@ -45,7 +45,7 @@ public class GameScreen implements Screen {
         players[0] = new Player(HUMAN_PLAYER_ID, Color.BLUE, 1000);
         players[1] = new Player(AI_PLAYER_ID, Color.RED, 1);
 
-        List<ConstructedBuilding> gameBuildings = new ArrayList<>();
+        List<PlacedBuilding> gameBuildings = new ArrayList<>();
 
         GameMap gameMap = new GameMap(32, 25, TILE_WIDTH, TILE_HEIGHT, players);
         this.gameScreenController = new GameScreenController(gameMap, players);
@@ -90,9 +90,9 @@ public class GameScreen implements Screen {
     }
 
     private void startGame() {
-        gameScreenController.subscribeOnConstructBuilding(new Consumer<ConstructedBuilding>() {
+        gameScreenController.subscribeOnPlaceBuilding(new Consumer<PlacedBuilding>() {
             @Override
-            public void accept(ConstructedBuilding constructedBuilding) {
+            public void accept(PlacedBuilding constructedBuilding) {
                 for (Player player: stateManager.getPlayers()) {
                     if (constructedBuilding.getOwner() == player.getId()) {
                         player.people.used += constructedBuilding.getBuilding().getPeopleRequired();

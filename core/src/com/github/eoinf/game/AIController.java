@@ -8,12 +8,12 @@ import java.util.function.Consumer;
 public class AIController {
     private int playerId;
     private Player[] players;
-    private List<ConstructedBuilding> buildings;
+    private List<PlacedBuilding> buildings;
     private boolean isPlanningPhase;
     private boolean isTurnEnded;
     private GameScreenController gameScreenController;
 
-    public AIController(int playerId, Player[] players, List<ConstructedBuilding> buildings, StateManager stateManager,
+    public AIController(int playerId, Player[] players, List<PlacedBuilding> buildings, StateManager stateManager,
                         GameScreenController gameScreenController) {
         this.players = players;
         this.buildings = buildings;

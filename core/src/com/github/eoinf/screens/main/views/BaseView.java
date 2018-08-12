@@ -7,10 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.github.eoinf.TextureManager;
-import com.github.eoinf.game.ConstructedBuilding;
 import com.github.eoinf.utils;
-
-import java.util.List;
 
 public abstract class BaseView {
     Stage stage;

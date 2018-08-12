@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.Building;
-import com.github.eoinf.game.ConstructedBuilding;
+import com.github.eoinf.game.PlacedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.MapTile;
 
@@ -20,7 +20,7 @@ import java.util.Map;
 public class SelectedBuildingActor extends Group {
     private Map<GridPoint2, SelectedBuildingTile> tilesMap;
     private GameMap gameMap;
-    private List<ConstructedBuilding> constructedBuildings;
+    private List<PlacedBuilding> constructedBuildings;
     private int playerId;
     private TextureManager textureManager;
 
@@ -39,11 +39,11 @@ public class SelectedBuildingActor extends Group {
         this.gameMap = gameMap;
     }
 
-    public void addNewConstructedBuilding(ConstructedBuilding constructedBuilding) {
+    public void addNewPlacedBuilding(PlacedBuilding constructedBuilding) {
         this.constructedBuildings.add(constructedBuilding);
     }
 
-    public void setConstructedBuildings(List<ConstructedBuilding> constructedBuildings) {
+    public void setConstructedBuildings(List<PlacedBuilding> constructedBuildings) {
         this.constructedBuildings = constructedBuildings;
     }
 
@@ -102,7 +102,7 @@ public class SelectedBuildingActor extends Group {
     }
 
     private boolean hasBuilding(MapTile tile) {
-        for (ConstructedBuilding constructedBuilding: constructedBuildings) {
+        for (PlacedBuilding constructedBuilding: constructedBuildings) {
             if (constructedBuilding.containsTile(tile)) {
                 return true;
             }

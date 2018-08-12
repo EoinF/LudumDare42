@@ -1,19 +1,23 @@
 package com.github.eoinf.screens.main.views;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.Building;
-import com.github.eoinf.game.ConstructedBuilding;
+import com.github.eoinf.game.PlacedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.MapTile;
 import com.github.eoinf.game.Player;
 import com.github.eoinf.screens.main.controllers.GameScreenController;
 import com.github.eoinf.screens.main.widgets.MapTileActor;
+import com.github.eoinf.screens.main.widgets.PlacedBuildingActor;
 import com.github.eoinf.screens.main.widgets.SelectedBuildingActor;
 
 import java.util.HashMap;
@@ -23,6 +27,7 @@ import java.util.function.Consumer;
 
 public class MainView extends BaseView {
     private Map<MapTile, MapTileActor> mapTileActors;
+    private Map<PlacedBuilding, PlacedBuildingActor> placedBuildingActors;
     private Player[] players;
     private GameMap gameMap;
 
@@ -37,6 +42,7 @@ public class MainView extends BaseView {
         this.initSubscriptions(gameScreenController);
         this.textureManager = textureManager;
         mapTileActors = new HashMap<>();
+        placedBuildingActors = new HashMap<>();
 
         selectedBuildingActor = new SelectedBuildingActor(textureManager, humanPlayerId);
 
@@ -47,19 +53,32 @@ public class MainView extends BaseView {
         rootTable.addActor(buildingGroup);
         rootTable.addActor(selectedBuildingActor);
 
-        stage.addListener(new ClickListener() {
+        // Left clicks
+        stage.addListener(new ClickListener(Input.Buttons.LEFT) {
             @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (selectedBuildingActor.isValidConstructionSite()) {
-                    System.out.println("valid construction");
-                    int tileX = (int)(selectedBuildingActor.getX() / gameMap.getTileWidth());
-                    int tileY = (int) (selectedBuildingActor.getY() / gameMap.getTileHeight());
-                    gameScreenController.constructBuilding((Building) selectedBuildingActor.getUserObject(),
-                            gameMap.getTile(tileX, tileY), humanPlayerId);
+            public void clicked(InputEvent event, float x, float y) {
+                if (selectedBuildingActor.getUserObject() != null) {
+                    if (selectedBuildingActor.isValidConstructionSite()) {
+                        System.out.println("valid construction");
+                        int tileX = (int) (selectedBuildingActor.getX() / gameMap.getTileWidth());
+                        int tileY = (int) (selectedBuildingActor.getY() / gameMap.getTileHeight());
+                        gameScreenController.placeBuilding((Building) selectedBuildingActor.getUserObject(),
+                                gameMap.getTile(tileX, tileY), humanPlayerId);
+                    }
                 }
-                super.touchUp(event, x, y, pointer, button);
+                super.clicked(event, x, y);
             }
         });
+
+        // Right clicks
+        stage.addListener(new ClickListener(Input.Buttons.RIGHT) {
+                              @Override
+                              public void clicked(InputEvent event, float x, float y) {
+                                  gameScreenController.setSelectedBuilding(null);
+                                  super.clicked(event, x, y);
+                              }
+                          }
+        );
     }
 
     private void initSubscriptions(GameScreenController gameScreenController) {
@@ -75,11 +94,17 @@ public class MainView extends BaseView {
                 selectedBuildingActor.setBuilding(building);
             }
         });
-        gameScreenController.subscribeOnConstructBuilding(new Consumer<ConstructedBuilding>() {
+        gameScreenController.subscribeOnPlaceBuilding(new Consumer<PlacedBuilding>() {
             @Override
-            public void accept(ConstructedBuilding constructedBuilding) {
-                selectedBuildingActor.addNewConstructedBuilding(constructedBuilding);
-                addNewBuilding(constructedBuilding);
+            public void accept(PlacedBuilding placedBuilding) {
+                selectedBuildingActor.addNewPlacedBuilding(placedBuilding);
+                addOrUpdateBuilding(placedBuilding);
+            }
+        });
+        gameScreenController.subscribeOnChangeBuilding(new Consumer<PlacedBuilding>() {
+            @Override
+            public void accept(PlacedBuilding placedBuilding) {
+                addOrUpdateBuilding(placedBuilding);
             }
         });
     }
@@ -104,10 +129,10 @@ public class MainView extends BaseView {
         selectedBuildingActor.setGameMap(gameMap);
     }
 
-    public void setBuildings(List<ConstructedBuilding> gameBuildings) {
+    public void setBuildings(List<PlacedBuilding> gameBuildings) {
         selectedBuildingActor.setConstructedBuildings(gameBuildings);
-        for(ConstructedBuilding constructedBuilding: gameBuildings) {
-            addNewBuilding(constructedBuilding);
+        for(PlacedBuilding constructedBuilding: gameBuildings) {
+            addOrUpdateBuilding(constructedBuilding);
         }
     }
 
@@ -116,11 +141,16 @@ public class MainView extends BaseView {
         actor.setTile(textureManager, tile, players);
     }
 
-    private void addNewBuilding(ConstructedBuilding constructedBuilding) {
-        Image buildingActor = new Image(textureManager.buildings.getByType(constructedBuilding.getBuilding().getType()));
-        buildingActor.setPosition(constructedBuilding.getOriginTile().getX() * gameMap.getTileWidth(),
-                constructedBuilding.getOriginTile().getY() * gameMap.getTileHeight());
+    private void addOrUpdateBuilding(PlacedBuilding placedBuilding) {
+        Actor existingActor = placedBuildingActors.get(placedBuilding);
+        if (existingActor != null) {
+            existingActor.remove();
+        }
+        PlacedBuildingActor buildingActor = new PlacedBuildingActor(textureManager, placedBuilding);
+        buildingActor.setPosition(placedBuilding.getOriginTile().getX() * gameMap.getTileWidth(),
+                placedBuilding.getOriginTile().getY() * gameMap.getTileHeight());
         buildingGroup.addActor(buildingActor);
+        placedBuildingActors.put(placedBuilding, buildingActor);
     }
 
     @Override

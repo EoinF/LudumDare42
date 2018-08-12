@@ -2,6 +2,8 @@ package com.github.eoinf.game;
 
 import com.badlogic.gdx.graphics.Color;
 
+import java.util.List;
+
 public class Player {
     private int id;
     private Color colour;
@@ -49,5 +51,14 @@ public class Player {
         this.soldier.total += this.soldier.delta;
         this.metal.total += this.metal.delta;
         this.wood.total += this.wood.delta;
+    }
+
+    public void calculateNextResources(List<PlacedBuilding> buildings) {
+        this.resetResourceUsage();
+        for (PlacedBuilding placedBuilding: buildings) {
+            if (placedBuilding.getOwner() == this.id && placedBuilding.isConstructed()) {
+                placedBuilding.getBuilding().getEffect().applyTo(this);
+            }
+        }
     }
 }
