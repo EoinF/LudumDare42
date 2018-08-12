@@ -32,13 +32,13 @@ public class MainView extends BaseView {
 
     public MainView(int startX, int startY, int width, int height,
                     Batch batch, TextureManager textureManager, GameScreenController gameScreenController,
-                    int playerId) {
+                    int humanPlayerId) {
         super(startX, startY, width, height, batch, textureManager);
         this.initSubscriptions(gameScreenController);
         this.textureManager = textureManager;
         mapTileActors = new HashMap<>();
 
-        selectedBuildingActor = new SelectedBuildingActor(textureManager, playerId);
+        selectedBuildingActor = new SelectedBuildingActor(textureManager, humanPlayerId);
 
         tileGroup = new Group();
         buildingGroup = new Group();
@@ -55,7 +55,7 @@ public class MainView extends BaseView {
                     int tileX = (int)(selectedBuildingActor.getX() / gameMap.getTileWidth());
                     int tileY = (int) (selectedBuildingActor.getY() / gameMap.getTileHeight());
                     gameScreenController.constructBuilding((Building) selectedBuildingActor.getUserObject(),
-                            gameMap.getTile(tileX, tileY), playerId);
+                            gameMap.getTile(tileX, tileY), humanPlayerId);
                 }
                 super.touchUp(event, x, y, pointer, button);
             }

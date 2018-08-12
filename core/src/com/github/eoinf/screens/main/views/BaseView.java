@@ -27,8 +27,8 @@ public abstract class BaseView {
         this.screenY = startY;
         this.camera = new OrthographicCamera(width, height);
         this.viewport = new FitViewport(width, height, camera);
-        viewport.setScreenBounds(startX, startY, width, height);
         this.stage = new Stage(viewport, batch);
+        viewport.setScreenBounds(startX, startY, width, height);
         this.textureManager = textureManager;
         initRootTable();
     }
@@ -40,8 +40,8 @@ public abstract class BaseView {
         this.screenY = startY;
         this.camera = new OrthographicCamera(width, height);
         this.viewport = new FitViewport(width, height, camera);
-        viewport.setScreenBounds(startX, startY, width, height);
         this.stage = new Stage(viewport, batch);
+        viewport.setScreenBounds(startX, startY, width, height);
         this.textureManager = textureManager;
         initRootTable(colour);
     }
@@ -65,7 +65,8 @@ public abstract class BaseView {
 
     public void render() {
         viewport.apply();
-        viewport.setScreenPosition(screenX, screenY);
+        viewport.setScreenBounds(screenX, screenY, viewport.getScreenWidth(), viewport.getScreenHeight());
+
         stage.draw();
     }
 }

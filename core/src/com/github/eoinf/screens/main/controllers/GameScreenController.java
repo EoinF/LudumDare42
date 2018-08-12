@@ -6,7 +6,7 @@ import com.github.eoinf.game.ConstructedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.MapTile;
 import com.github.eoinf.game.Player;
-import javafx.util.Pair;
+import com.github.eoinf.game.StateManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,31 +22,36 @@ public class GameScreenController {
         this.mapTileObservers = new ArrayList<>();
         this.selectedBuildingObservers = new ArrayList<>();
         this.constructBuildingObservers = new ArrayList<>();
+        this.stateObservers = new ArrayList<>();
+        this.playerObservers = new ArrayList<>();
     }
 
     //
     // Change individual map tiles
     //
     private List<Consumer<MapTile>> mapTileObservers;
+
     public void subscribeOnChangeTile(Consumer<MapTile> onChangeMapTile) {
         this.mapTileObservers.add(onChangeMapTile);
     }
 
     public void changeTile(MapTile tile) {
-        for (Consumer<MapTile> observer: mapTileObservers) {
+        for (Consumer<MapTile> observer : mapTileObservers) {
             observer.accept(tile);
         }
     }
+
     //
     // Set selected building
     //
     private List<Consumer<Building>> selectedBuildingObservers;
+
     public void subscribeOnSelectBuilding(Consumer<Building> onSelectBuilding) {
         this.selectedBuildingObservers.add(onSelectBuilding);
     }
 
     public void setSelectedBuilding(Building building) {
-        for (Consumer<Building> observer: selectedBuildingObservers) {
+        for (Consumer<Building> observer : selectedBuildingObservers) {
             observer.accept(building);
         }
     }
@@ -55,6 +60,7 @@ public class GameScreenController {
     // Construct building
     //
     private List<Consumer<ConstructedBuilding>> constructBuildingObservers;
+
     public void subscribeOnConstructBuilding(Consumer<ConstructedBuilding> onConstructBuilding) {
         this.constructBuildingObservers.add(onConstructBuilding);
     }
@@ -63,7 +69,7 @@ public class GameScreenController {
         int tileX = originTile.getX();
         int tileY = originTile.getY();
         Player player = null;
-        for (Player p: this.players) {
+        for (Player p : this.players) {
             if (p.getId() == owner) {
                 player = p;
             }
@@ -81,5 +87,34 @@ public class GameScreenController {
         return false;
     }
 
+    //
+    // Set State
+    //
+    private List<Consumer<StateManager.State>> stateObservers;
 
+    public void subscribeOnSetState(Consumer<StateManager.State> onSetState) {
+        this.stateObservers.add(onSetState);
+    }
+
+    public void setState(StateManager.State nextState) {
+        for (Consumer<StateManager.State> observer : stateObservers) {
+            observer.accept(nextState);
+        }
+    }
+
+
+    //
+    // Change Player (i.e. resource counts)
+    //
+    private List<Consumer<Player>> playerObservers;
+
+    public void subscribeOnChangePlayer(Consumer<Player> onChangePlayer) {
+        this.playerObservers.add(onChangePlayer);
+    }
+
+    public void changePlayer(Player player) {
+        for (Consumer<Player> observer : playerObservers) {
+            observer.accept(player);
+        }
+    }
 }

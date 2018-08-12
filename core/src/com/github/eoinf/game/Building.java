@@ -11,11 +11,15 @@ public class Building {
 
     private String name;
     private BuildingType buildingType;
+    private BuildingEffect effect;
+    private int peopleRequired;
 
-    public Building(String name, GridPoint2[] shape, BuildingType buildingType) {
+    public Building(String name, GridPoint2[] shape, BuildingType buildingType, BuildingEffect effect, int peopleRequired) {
         this.name = name;
+        this.effect = effect;
         this.shape = shape;
         this.buildingType = buildingType;
+        this.peopleRequired = peopleRequired;
     }
 
     public BuildingType getType() {
@@ -28,6 +32,14 @@ public class Building {
 
     public String getName() {
         return name;
+    }
+
+    public BuildingEffect getEffect() {
+        return effect;
+    }
+
+    public int getPeopleRequired() {
+        return peopleRequired;
     }
 
     public enum BuildingType {
