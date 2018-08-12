@@ -3,6 +3,7 @@ package com.github.eoinf.screens.main.views;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,13 +13,18 @@ import com.github.eoinf.game.MapObjectBlueprint;
 import com.github.eoinf.game.PlacedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.MapTile;
+import com.github.eoinf.game.PlacedObject;
 import com.github.eoinf.game.PlacedUnit;
 import com.github.eoinf.game.Player;
 import com.github.eoinf.screens.main.controllers.GameScreenController;
+import com.github.eoinf.screens.main.widgets.ActionActor;
+import com.github.eoinf.screens.main.widgets.ActionButton;
 import com.github.eoinf.screens.main.widgets.MapTileActor;
 import com.github.eoinf.screens.main.widgets.PlacedBuildingActor;
+import com.github.eoinf.screens.main.widgets.PlacedObjectActor;
 import com.github.eoinf.screens.main.widgets.PlacedUnitActor;
 import com.github.eoinf.screens.main.widgets.SelectedObjectActor;
+import com.github.eoinf.screens.main.widgets.SelectedPlacedObjectActor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +42,9 @@ public class MainView extends BaseView {
     private Group tileGroup;
     private Group buildingGroup;
     private Group unitGroup;
+
     private SelectedObjectActor selectedObjectActor;
+    private SelectedPlacedObjectActor selectedPlacedObjectActor;
 
     public MainView(int startX, int startY, int width, int height,
                     Batch batch, TextureManager textureManager, GameScreenController gameScreenController,
@@ -51,6 +59,7 @@ public class MainView extends BaseView {
         placedUnitActors = new HashMap<>();
 
         selectedObjectActor = new SelectedObjectActor(textureManager, humanPlayer);
+        selectedPlacedObjectActor = new SelectedPlacedObjectActor(textureManager, humanPlayer, gameScreenController);
 
         tileGroup = new Group();
         buildingGroup = new Group();
@@ -60,19 +69,31 @@ public class MainView extends BaseView {
         rootTable.addActor(buildingGroup);
         rootTable.addActor(unitGroup);
         rootTable.addActor(selectedObjectActor);
+        rootTable.addActor(selectedPlacedObjectActor);
 
         // Left clicks
         stage.addListener(new ClickListener(Input.Buttons.LEFT) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                MapObjectBlueprint blueprint = (MapObjectBlueprint) selectedObjectActor.getUserObject();
-                if (blueprint != null) {
-                    if (selectedObjectActor.isValidConstructionSite()) {
-                        System.out.println("valid construction");
-                        int tileX = (int) (selectedObjectActor.getX() / gameMap.getTileWidth());
-                        int tileY = (int) (selectedObjectActor.getY() / gameMap.getTileHeight());
-                        gameScreenController.placeObject((MapObjectBlueprint) selectedObjectActor.getUserObject(),
-                                gameMap.getTile(tileX, tileY), humanPlayer.getId());
+                Actor hit = stage.hit(x, y, true);
+
+                if (hit instanceof ActionActor) {
+                    // Ignore action actor hits
+                }
+                else if (hit instanceof PlacedObjectActor) {
+                    gameScreenController.setSelectedPlacedObject((PlacedObject) hit.getUserObject());
+                } else {
+                    MapObjectBlueprint blueprint = (MapObjectBlueprint) selectedObjectActor.getUserObject();
+                    if (blueprint != null) {
+                        if (selectedObjectActor.isValidConstructionSite()) {
+                            System.out.println("valid construction");
+                            int tileX = (int) (selectedObjectActor.getX() / gameMap.getTileWidth());
+                            int tileY = (int) (selectedObjectActor.getY() / gameMap.getTileHeight());
+                            gameScreenController.placeObject((MapObjectBlueprint) selectedObjectActor.getUserObject(),
+                                    gameMap.getTile(tileX, tileY), humanPlayer.getId());
+                        }
+                    } else {
+                        gameScreenController.setSelectedPlacedObject(null);
                     }
                 }
                 super.clicked(event, x, y);
@@ -103,6 +124,18 @@ public class MainView extends BaseView {
                 selectedObjectActor.setObject(building);
             }
         });
+        gameScreenController.subscribeOnSelectPlacedObject(new Consumer<PlacedObject>() {
+            @Override
+            public void accept(PlacedObject placedObject) {
+                if (placedObject != null) {
+                    selectedPlacedObjectActor.setPlacedObject(placedObject, gameMap);
+                    selectedObjectActor.setObject(null);
+                } else {
+                    selectedPlacedObjectActor.clearPlacedObject();
+                }
+            }
+        });
+
         gameScreenController.subscribeOnPlaceBuilding(new Consumer<PlacedBuilding>() {
             @Override
             public void accept(PlacedBuilding placedBuilding) {
@@ -129,6 +162,21 @@ public class MainView extends BaseView {
                 addOrUpdateUnit(placedUnit);
             }
         });
+
+        gameScreenController.subscribeOnDestroyPlacedObject(new Consumer<PlacedObject>() {
+            @Override
+            public void accept(PlacedObject placedObject) {
+                if (selectedPlacedObjectActor.getUserObject() == placedObject) {
+                    selectedPlacedObjectActor.clearPlacedObject();
+                }
+                if (placedObject instanceof PlacedBuilding) {
+                    selectedObjectActor.removePlacedBuilding((PlacedBuilding) placedObject);
+                    removeBuilding((PlacedBuilding)placedObject);
+                } else {
+                    removeUnit((PlacedUnit)placedObject);
+                }
+            }
+        });
     }
 
     public void setPlayers(Player[] players) {
@@ -152,7 +200,7 @@ public class MainView extends BaseView {
     }
 
     public void setBuildings(List<PlacedBuilding> gameBuildings) {
-        selectedObjectActor.setConstructedBuildings(gameBuildings);
+        selectedObjectActor.setPlacedBuildings(gameBuildings);
         for(PlacedBuilding constructedBuilding: gameBuildings) {
             addOrUpdateBuilding(constructedBuilding);
         }
@@ -164,10 +212,7 @@ public class MainView extends BaseView {
     }
 
     private void addOrUpdateBuilding(PlacedBuilding placedBuilding) {
-        Actor existingActor = placedBuildingActors.get(placedBuilding);
-        if (existingActor != null) {
-            existingActor.remove();
-        }
+        removeBuilding(placedBuilding);
         PlacedBuildingActor buildingActor = new PlacedBuildingActor(textureManager, placedBuilding);
         buildingActor.setPosition(placedBuilding.getOriginTile().getX() * gameMap.getTileWidth(),
                 placedBuilding.getOriginTile().getY() * gameMap.getTileHeight());
@@ -175,12 +220,15 @@ public class MainView extends BaseView {
         placedBuildingActors.put(placedBuilding, buildingActor);
     }
 
-    private void addOrUpdateUnit(PlacedUnit placedUnit) {
-        Actor existingActor = placedUnitActors.get(placedUnit);
+    private void removeBuilding(PlacedBuilding placedBuilding) {
+        Actor existingActor = placedBuildingActors.get(placedBuilding);
         if (existingActor != null) {
             existingActor.remove();
         }
+    }
 
+    private void addOrUpdateUnit(PlacedUnit placedUnit) {
+        removeUnit(placedUnit);
         PlacedUnitActor unitActor = new PlacedUnitActor(textureManager, placedUnit, humanPlayer.getColour());
         unitActor.setPosition(placedUnit.getOriginTile().getX() * gameMap.getTileWidth(),
                 placedUnit.getOriginTile().getY() * gameMap.getTileHeight());
@@ -188,15 +236,58 @@ public class MainView extends BaseView {
         placedUnitActors.put(placedUnit, unitActor);
     }
 
+    private void removeUnit(PlacedUnit placedUnit) {
+        Actor existingActor = placedUnitActors.get(placedUnit);
+        if (existingActor != null) {
+            existingActor.remove();
+        }
+    }
+
     @Override
     public void update(float delta) {
-        int mouseX = Gdx.input.getX() - this.screenX;
-        int mouseY = (int) camera.viewportHeight - Gdx.input.getY();
+        Vector3 mousePositionOnScreen = new Vector3(Gdx.input.getX(),
+                Gdx.input.getY(),
+                0);
+
+        Vector3 mousePositionInWorld = camera.unproject(mousePositionOnScreen, screenX, screenY,
+                camera.viewportWidth, camera.viewportHeight);
+        int mouseX = (int)mousePositionInWorld.x;
+        int mouseY = (int)mousePositionInWorld.y;
+
+        checkCameraInput(delta);
 
         int tileX = (mouseX / gameMap.getTileWidth());
         int tileY = (mouseY / gameMap.getTileHeight());
         selectedObjectActor.setTileXY(tileX, tileY);
 
         super.update(delta);
+    }
+
+    private void checkCameraInput(float delta) {
+        final float CAMERA_SPEED = 200;
+        final float CAMERA_MARGIN = 300;
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            camera.position.y += delta * CAMERA_SPEED;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            camera.position.x -= delta * CAMERA_SPEED;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            camera.position.y -= delta * CAMERA_SPEED;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            camera.position.x += delta * CAMERA_SPEED;
+        }
+
+        if (camera.position.x < (camera.viewportWidth / 2) - CAMERA_MARGIN) {
+            camera.position.x = (camera.viewportWidth / 2) - CAMERA_MARGIN;
+        } else if (camera.position.x > (camera.viewportWidth / 2) + CAMERA_MARGIN) {
+            camera.position.x = (camera.viewportWidth / 2) + CAMERA_MARGIN;
+        }
+        if (camera.position.y < (camera.viewportHeight / 2) - CAMERA_MARGIN) {
+            camera.position.y = (camera.viewportHeight / 2) - CAMERA_MARGIN;
+        } else if (camera.position.y > (camera.viewportHeight / 2) + CAMERA_MARGIN) {
+            camera.position.y = (camera.viewportHeight / 2) + CAMERA_MARGIN;
+        }
     }
 }

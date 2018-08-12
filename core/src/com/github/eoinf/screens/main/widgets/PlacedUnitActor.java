@@ -1,15 +1,17 @@
 package com.github.eoinf.screens.main.widgets;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.PlacedUnit;
 
-public class PlacedUnitActor extends Group {
+public class PlacedUnitActor extends Group implements PlacedObjectActor {
     private static final Color PLACED_COLOUR = new Color(0.4f, 0.2f, 0.5f, 0.8f);
 
     public PlacedUnitActor(TextureManager textureManager, PlacedUnit placedUnit, Color playerColour) {
+        setUserObject(placedUnit);
         setTransform(false); // Avoids triggering a flush of spritebatch on drawing this
 
         UnitActor unitActor = new UnitActor(textureManager, placedUnit.getUnit(), playerColour);
@@ -20,5 +22,14 @@ public class PlacedUnitActor extends Group {
             addActor(background);
         }
         addActor(unitActor);
+    }
+
+    @Override
+    public Actor hit(float x, float y, boolean touchable) {
+        if (super.hit(x, y, touchable) != null) {
+            return this;
+        } else {
+            return null;
+        }
     }
 }

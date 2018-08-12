@@ -1,20 +1,22 @@
 package com.github.eoinf.game;
 
-import java.util.List;
-
-public class PlacedUnit {
+public class PlacedUnit implements PlacedObject{
     private int owner;
     private Unit unit;
     private MapTile originTile;
-    private List<MapTile> mapTiles;
     private boolean isDeployed;
+    private boolean isAlive;
 
-    public PlacedUnit(Unit unit, MapTile originTile, List<MapTile> mapTiles, int owner,
-                          boolean isDeployed) {
+    private MapTile destinationTile;
+    private MapTile targetTile;
+
+    public PlacedUnit(Unit unit, MapTile originTile, int owner, boolean isDeployed) {
         this.isDeployed = isDeployed;
+        this.isAlive = true;
         this.unit = unit;
-        this.mapTiles = mapTiles;
         this.originTile = originTile;
+        this.destinationTile = null;
+        this.targetTile = null;
         this.owner = owner;
     }
 
@@ -35,5 +37,34 @@ public class PlacedUnit {
     }
     public void setIsDeployed(boolean isDeployed) {
         this.isDeployed = isDeployed;
+    }
+
+    @Override
+    public MapObjectBlueprint getBlueprint() {
+        return unit;
+    }
+
+    public void setDestinationTile(MapTile tile) {
+        destinationTile = tile;
+    }
+
+    public void setMapLocation(MapTile tile) {
+        this.originTile = tile;
+    }
+
+    public MapTile getDestinationTile() {
+        return destinationTile;
+    }
+
+    public MapTile getTarget() {
+        return targetTile;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(boolean alive) {
+        isAlive = alive;
     }
 }

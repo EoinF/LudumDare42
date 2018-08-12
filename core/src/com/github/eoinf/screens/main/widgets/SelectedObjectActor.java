@@ -12,7 +12,6 @@ import com.github.eoinf.game.MapObjectBlueprint;
 import com.github.eoinf.game.PlacedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.MapTile;
-import com.github.eoinf.game.PlacedUnit;
 import com.github.eoinf.game.Player;
 import com.github.eoinf.game.Unit;
 
@@ -24,7 +23,7 @@ import java.util.Map;
 public class SelectedObjectActor extends Group {
     private Map<GridPoint2, SelectedBuildingTile> tilesMap;
     private GameMap gameMap;
-    private List<PlacedBuilding> constructedBuildings;
+    private List<PlacedBuilding> placedBuildings;
     private Player humanPlayer;
     private TextureManager textureManager;
 
@@ -36,7 +35,7 @@ public class SelectedObjectActor extends Group {
         setTouchable(Touchable.disabled);
         this.isValidConstructionSite = false;
         this.humanPlayer = humanPlayer;
-        this.constructedBuildings = new ArrayList<>();
+        this.placedBuildings = new ArrayList<>();
     }
 
     public void setGameMap(GameMap gameMap) {
@@ -44,14 +43,14 @@ public class SelectedObjectActor extends Group {
     }
 
     public void addNewPlacedBuilding(PlacedBuilding constructedBuilding) {
-        this.constructedBuildings.add(constructedBuilding);
+        this.placedBuildings.add(constructedBuilding);
     }
 
-    public void setConstructedBuildings(List<PlacedBuilding> constructedBuildings) {
-        this.constructedBuildings = constructedBuildings;
+    public void setPlacedBuildings(List<PlacedBuilding> placedBuildings) {
+        this.placedBuildings = placedBuildings;
     }
 
-    public void setBuilding(Building building) {
+    private void setBuilding(Building building) {
         this.clear();
         if (building == null) {
             setUserObject(null);
@@ -62,7 +61,7 @@ public class SelectedObjectActor extends Group {
         }
     }
 
-    public void setUnit(Unit unit) {
+    private void setUnit(Unit unit) {
         this.clear();
         if (unit == null) {
             setUserObject(null);
@@ -111,7 +110,7 @@ public class SelectedObjectActor extends Group {
     }
 
     private boolean hasBuilding(MapTile tile) {
-        for (PlacedBuilding constructedBuilding : constructedBuildings) {
+        for (PlacedBuilding constructedBuilding : placedBuildings) {
             if (constructedBuilding.containsTile(tile)) {
                 return true;
             }
@@ -139,6 +138,10 @@ public class SelectedObjectActor extends Group {
                 tilesMap.put(tileOccupied, selectedBuildingTile);
             }
         }
+    }
+
+    public void removePlacedBuilding(PlacedBuilding placedBuilding) {
+        placedBuildings.remove(placedBuilding);
     }
 
     class SelectedBuildingTile extends Image {

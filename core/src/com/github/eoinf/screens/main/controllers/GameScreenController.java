@@ -5,6 +5,7 @@ import com.github.eoinf.game.MapObjectBlueprint;
 import com.github.eoinf.game.PlacedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.MapTile;
+import com.github.eoinf.game.PlacedObject;
 import com.github.eoinf.game.PlacedUnit;
 import com.github.eoinf.game.Player;
 import com.github.eoinf.game.StateManager;
@@ -31,6 +32,9 @@ public class GameScreenController {
 
         this.placeUnitObservers = new ArrayList<>();
         this.changeUnitObservers = new ArrayList<>();
+
+        this.selectPlacedObjectObservers = new ArrayList<>();
+        this.destroyPlacedObjectObservers = new ArrayList<>();
     }
 
     //
@@ -130,8 +134,7 @@ public class GameScreenController {
                 && player.canCreateUnit(unit)) {
             System.out.println("Placing unit: " + unit.getName() + " at " + tileX + ", " + tileY
                     + " for player " + owner);
-            List<MapTile> buildingTiles = gameMap.getBlueprintTiles(unit, tileX, tileY);
-            PlacedUnit placedUnit = new PlacedUnit(unit, originTile, buildingTiles, owner, false);
+            PlacedUnit placedUnit = new PlacedUnit(unit, originTile, owner, false);
             for (Consumer<PlacedUnit> observer : placeUnitObservers) {
                 observer.accept(placedUnit);
             }
@@ -210,6 +213,33 @@ public class GameScreenController {
     public void changeUnit(PlacedUnit unit) {
         for (Consumer<PlacedUnit> observer : changeUnitObservers) {
             observer.accept(unit);
+        }
+    }
+
+    //
+    // Destroy placed object
+    //
+    private List<Consumer<PlacedObject>> destroyPlacedObjectObservers;
+    public void subscribeOnDestroyPlacedObject(Consumer<PlacedObject> onDestroyPlacedObject) {
+        this.destroyPlacedObjectObservers.add(onDestroyPlacedObject);
+    }
+    public void destroyPlacedObject(PlacedObject object) {
+        for (Consumer<PlacedObject> observer : destroyPlacedObjectObservers) {
+            observer.accept(object);
+        }
+    }
+
+
+    //
+    // Select placed object
+    //
+    private List<Consumer<PlacedObject>> selectPlacedObjectObservers;
+    public void subscribeOnSelectPlacedObject(Consumer<PlacedObject> onSelectPlacedObject) {
+        this.selectPlacedObjectObservers.add(onSelectPlacedObject);
+    }
+    public void setSelectedPlacedObject(PlacedObject object) {
+        for (Consumer<PlacedObject> observer : selectPlacedObjectObservers) {
+            observer.accept(object);
         }
     }
 }

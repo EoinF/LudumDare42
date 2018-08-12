@@ -2,7 +2,7 @@ package com.github.eoinf.game;
 
 import java.util.List;
 
-public class PlacedBuilding {
+public class PlacedBuilding implements PlacedObject {
     private Building building;
     private MapTile originTile;
     private List<MapTile> mapTiles;
@@ -40,5 +40,10 @@ public class PlacedBuilding {
 
     public void setIsConstructed(boolean isConstructed) {
         this.isConstructed = isConstructed;
+    }
+
+    @Override
+    public MapObjectBlueprint getBlueprint() {
+        return building;
     }
 }

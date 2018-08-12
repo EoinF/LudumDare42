@@ -6,5 +6,4 @@ public interface MapObjectBlueprint {
     String getName();
     String getDescription();
     GridPoint2[] getShape();
-
 }

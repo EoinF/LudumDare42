@@ -66,7 +66,7 @@ public class StateManager {
                         playerIdTurnEnded.clear();
                     } else if (nextState == PLANNING_PHASE) {
                         // Entering the planning phase
-                        for (Player player: players) {
+                        for (Player player : players) {
                             player.calculateNextResources(buildings);
                             gameScreenController.changePlayer(player);
                         }
@@ -103,6 +103,7 @@ public class StateManager {
                 }
                 break;
             case ACTION_PHASE:
+                actionPhase();
                 gameScreenController.setState(DEPLOYMENT_PHASE);
                 break;
             case DEPLOYMENT_PHASE:
@@ -112,6 +113,54 @@ public class StateManager {
                 productionPhase();
                 gameScreenController.setState(PLANNING_PHASE);
                 break;
+        }
+    }
+
+    private void actionPhase() {
+        //
+        // Swordsmen attack first
+        //
+        for (PlacedUnit swordsman : units) {
+            if (swordsman.getUnit().getWeapon() == Unit.WeaponType.SWORD) {
+                MapTile attackTarget = swordsman.getTarget();
+                if (attackTarget != null) {
+                    for (PlacedUnit otherUnit : units) {
+                        if (otherUnit != swordsman
+                                && otherUnit.getOriginTile() == attackTarget) {
+                            otherUnit.setAlive(false);
+                            gameScreenController.changeUnit(otherUnit);
+                        }
+                    }
+                }
+            }
+        }
+        //
+        // Then units move
+        //
+        for (PlacedUnit movingUnit : units) {
+            MapTile destination = movingUnit.getDestinationTile();
+            if (destination != null) {
+                movingUnit.setMapLocation(destination);
+                gameScreenController.changeUnit(movingUnit);
+            }
+        }
+
+        //
+        // Then archers attack
+        //
+        for (PlacedUnit archer : units) {
+            if (archer.getUnit().getWeapon() == Unit.WeaponType.BOW_AND_ARROW) {
+                MapTile attackTarget = archer.getTarget();
+                if (attackTarget != null) {
+                    for (PlacedUnit otherUnit : units) {
+                        if (otherUnit != archer
+                                && otherUnit.getOriginTile() == attackTarget) {
+                            otherUnit.setAlive(false);
+                            gameScreenController.changeUnit(otherUnit);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -130,7 +179,7 @@ public class StateManager {
                 }
             }
 
-            for (PlacedUnit unit: units) {
+            for (PlacedUnit unit : units) {
                 if (!unit.isDeployed()) {
                     unit.setIsDeployed(true);
                     gameScreenController.changeUnit(unit);

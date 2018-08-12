@@ -63,7 +63,6 @@ public abstract class BaseView {
     public void render() {
         viewport.apply();
         viewport.setScreenBounds(screenX, screenY, viewport.getScreenWidth(), viewport.getScreenHeight());
-
         stage.draw();
     }
 }
