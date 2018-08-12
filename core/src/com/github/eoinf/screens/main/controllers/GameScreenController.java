@@ -1,11 +1,14 @@
 package com.github.eoinf.screens.main.controllers;
 
 import com.github.eoinf.game.Building;
+import com.github.eoinf.game.MapObjectBlueprint;
 import com.github.eoinf.game.PlacedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.MapTile;
+import com.github.eoinf.game.PlacedUnit;
 import com.github.eoinf.game.Player;
 import com.github.eoinf.game.StateManager;
+import com.github.eoinf.game.Unit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +22,15 @@ public class GameScreenController {
         this.gameMap = gameMap;
         this.players = players;
         this.mapTileObservers = new ArrayList<>();
-        this.selectedBuildingObservers = new ArrayList<>();
+        this.selectedObjectObservers = new ArrayList<>();
         this.placeBuildingObservers = new ArrayList<>();
         this.stateObservers = new ArrayList<>();
         this.playerObservers = new ArrayList<>();
         this.endTurnObservers = new ArrayList<>();
         this.changeBuildingObservers = new ArrayList<>();
+
+        this.placeUnitObservers = new ArrayList<>();
+        this.changeUnitObservers = new ArrayList<>();
     }
 
     //
@@ -45,15 +51,15 @@ public class GameScreenController {
     //
     // Set selected building
     //
-    private List<Consumer<Building>> selectedBuildingObservers;
+    private List<Consumer<MapObjectBlueprint>> selectedObjectObservers;
 
-    public void subscribeOnSelectBuilding(Consumer<Building> onSelectBuilding) {
-        this.selectedBuildingObservers.add(onSelectBuilding);
+    public void subscribeOnSelectObject(Consumer<MapObjectBlueprint> onSelectObject) {
+        this.selectedObjectObservers.add(onSelectObject);
     }
 
-    public void setSelectedBuilding(Building building) {
-        for (Consumer<Building> observer : selectedBuildingObservers) {
-            observer.accept(building);
+    public void setSelectedObject(MapObjectBlueprint blueprint) {
+        for (Consumer<MapObjectBlueprint> observer : selectedObjectObservers) {
+            observer.accept(blueprint);
         }
     }
 
@@ -64,6 +70,16 @@ public class GameScreenController {
 
     public void subscribeOnPlaceBuilding(Consumer<PlacedBuilding> onPlaceBuilding) {
         this.placeBuildingObservers.add(onPlaceBuilding);
+    }
+
+    public boolean placeObject(MapObjectBlueprint blueprint, MapTile originTile, int owner) {
+        if (blueprint instanceof Building) {
+            return placeBuilding((Building) blueprint, originTile, owner);
+        } else if (blueprint instanceof Unit) {
+            return placeUnit((Unit) blueprint, originTile, owner);
+        } else {
+            return false;
+        }
     }
 
     public boolean placeBuilding(Building building, MapTile originTile, int owner) {
@@ -80,9 +96,44 @@ public class GameScreenController {
                 && player.canConstructBuilding(building)) {
             System.out.println("Placing building: " + building.getName() + " at " + tileX + ", " + tileY
                     + " for player " + owner);
-            List<MapTile> buildingTiles = gameMap.getBuildingTiles(building, tileX, tileY);
+            List<MapTile> buildingTiles = gameMap.getBlueprintTiles(building, tileX, tileY);
+            PlacedBuilding placedBuilding = new PlacedBuilding(building, originTile, buildingTiles, owner, false);
             for (Consumer<PlacedBuilding> observer : placeBuildingObservers) {
-                observer.accept(new PlacedBuilding(building, originTile, buildingTiles, owner, false));
+                observer.accept(placedBuilding);
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    //
+    // Place new unit
+    //
+    private List<Consumer<PlacedUnit>> placeUnitObservers;
+
+    public void subscribeOnPlaceUnit(Consumer<PlacedUnit> onPlaceUnit) {
+        this.placeUnitObservers.add(onPlaceUnit);
+    }
+
+    public boolean placeUnit(Unit unit, MapTile originTile, int owner) {
+        int tileX = originTile.getX();
+        int tileY = originTile.getY();
+        Player player = null;
+        for (Player p : this.players) {
+            if (p.getId() == owner) {
+                player = p;
+                break;
+            }
+        }
+        if (gameMap.canPlaceUnit(unit, tileX, tileY, owner)
+                && player.canCreateUnit(unit)) {
+            System.out.println("Placing unit: " + unit.getName() + " at " + tileX + ", " + tileY
+                    + " for player " + owner);
+            List<MapTile> buildingTiles = gameMap.getBlueprintTiles(unit, tileX, tileY);
+            PlacedUnit placedUnit = new PlacedUnit(unit, originTile, buildingTiles, owner, false);
+            for (Consumer<PlacedUnit> observer : placeUnitObservers) {
+                observer.accept(placedUnit);
             }
             return true;
         }
@@ -147,6 +198,18 @@ public class GameScreenController {
     public void changeBuilding(PlacedBuilding building) {
         for (Consumer<PlacedBuilding> observer : changeBuildingObservers) {
             observer.accept(building);
+        }
+    }
+    //
+    // Change building
+    //
+    private List<Consumer<PlacedUnit>> changeUnitObservers;
+    public void subscribeOnChangeUnit(Consumer<PlacedUnit> onChangeUnit) {
+        this.changeUnitObservers.add(onChangeUnit);
+    }
+    public void changeUnit(PlacedUnit unit) {
+        for (Consumer<PlacedUnit> observer : changeUnitObservers) {
+            observer.accept(unit);
         }
     }
 }

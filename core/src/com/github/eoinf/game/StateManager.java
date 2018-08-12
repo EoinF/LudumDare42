@@ -16,6 +16,7 @@ public class StateManager {
     private GameMap gameMap;
     private Player[] players;
     private List<PlacedBuilding> buildings;
+    private List<PlacedUnit> units;
 
 
     private Set<Integer> playerIdTurnEnded;
@@ -46,11 +47,12 @@ public class StateManager {
         PRODUCTION_PHASE
     }
 
-    public StateManager(Player[] players, GameMap gameMap, List<PlacedBuilding> buildings,
+    public StateManager(Player[] players, GameMap gameMap, List<PlacedBuilding> buildings, List<PlacedUnit> units,
                         GameScreenController gameScreenController) {
         this.players = players;
         this.gameMap = gameMap;
         this.buildings = buildings;
+        this.units = units;
         this.gameScreenController = gameScreenController;
         this.state = PLANNING_PHASE;
         playerIdTurnEnded = new HashSet<>();
@@ -78,6 +80,13 @@ public class StateManager {
             @Override
             public void accept(Integer playerId) {
                 endTurnFor(playerId);
+            }
+        });
+
+        gameScreenController.subscribeOnPlaceUnit(new Consumer<PlacedUnit>() {
+            @Override
+            public void accept(PlacedUnit placedUnit) {
+                units.add(placedUnit);
             }
         });
     }
@@ -118,6 +127,13 @@ public class StateManager {
                 } else {
                     building.setIsConstructed(true);
                     gameScreenController.changeBuilding(building);
+                }
+            }
+
+            for (PlacedUnit unit: units) {
+                if (!unit.isDeployed()) {
+                    unit.setIsDeployed(true);
+                    gameScreenController.changeUnit(unit);
                 }
             }
             player.collectNewResources();

@@ -57,15 +57,9 @@ public class BuildingsTable extends Table {
     private void addBuildingRow(int tileWidth, int tileHeight, Building building, Table categoryTable) {
         categoryTable.add(new Label(building.getName(), textureManager.skin)).top();
 
-        BuildingActor buildingWidget = new BuildingActor(this.textureManager, building);
+        BuildingActor buildingWidget = new BuildingActor(this.textureManager, building, tileWidth, tileHeight);
 
-        for (GridPoint2 tileOccupied : building.getShape()) {
-            Image tileImage = new Image(textureManager.tiles.border);
-            tileImage.setPosition(tileOccupied.x * tileWidth, tileOccupied.y * tileHeight);
-            tileImage.setColor(1, 1, 1, 0.5f);
-            buildingWidget.addActor(tileImage);
-        }
-        categoryTable.add(buildingWidget);
+        categoryTable.add(buildingWidget).fillX().expandX().left();
         row();
     }
 

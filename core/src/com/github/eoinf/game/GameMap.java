@@ -79,11 +79,21 @@ public class GameMap {
         return true;
     }
 
-    public List<MapTile> getBuildingTiles(Building building, int tileX, int tileY) {
+    public List<MapTile> getBlueprintTiles(MapObjectBlueprint blueprint, int tileX, int tileY) {
         List<MapTile> tiles = new ArrayList<>();
-        for (GridPoint2 point: building.getShape()) {
+        for (GridPoint2 point: blueprint.getShape()) {
             tiles.add(getTile(tileX + point.x, tileY + point.y));
         }
         return tiles;
+    }
+
+    public boolean canPlaceUnit(Unit unit, int tileX, int tileY, int playerId) {
+        for (GridPoint2 point : unit.getShape()) {
+        MapTile tile = getTile(tileX + point.x, tileY + point.y);
+        if (tile == null || !tile.isOwnedBy(playerId)) {
+            return false;
+        }
+    }
+        return true;
     }
 }

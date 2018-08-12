@@ -22,9 +22,15 @@ public class TextureManager {
     private static final String ICON_PRODUCTION = "ui/iconProduction";
     private static final String ICON_UNITS = "ui/iconUnits";
 
+    private static final String UNIT_BASIC_CLOTHES = "units/basicClothes";
+    private static final String UNIT_BASIC_CORE = "units/basicCore";
+    private static final String UNIT_WEAPON_BOW = "units/weaponBow";
+    private static final String UNIT_WEAPON_SWORD = "units/weaponSword";
+
     public TileTextures tiles;
     public BuildingTextures buildings;
     public UITextures ui;
+    public UnitTextures units;
     public Skin skin;
 
     public TextureManager(TextureAtlas atlas, Skin skin) {
@@ -54,6 +60,15 @@ public class TextureManager {
         ui.iconBuildings = loadRegion(atlas, ICON_BUILDINGS);
         ui.iconProduction = loadRegion(atlas, ICON_PRODUCTION);
         ui.iconUnits = loadRegion(atlas, ICON_UNITS);
+
+        //
+        // Units
+        //
+        this.units = new UnitTextures();
+        units.basicCore = loadRegion(atlas, UNIT_BASIC_CORE);
+        units.basicClothes = loadRegion(atlas, UNIT_BASIC_CLOTHES);
+        units.weaponBow = loadRegion(atlas, UNIT_WEAPON_BOW);
+        units.weaponSword = loadRegion(atlas, UNIT_WEAPON_SWORD);
     }
 
     private TextureRegion loadRegion(TextureAtlas atlas, String index) {
@@ -88,5 +103,13 @@ public class TextureManager {
         public TextureRegion iconBuildings;
         public TextureRegion iconProduction;
         public TextureRegion iconUnits;
+    }
+
+    public class UnitTextures {
+        public TextureRegion basicCore;
+        public TextureRegion basicClothes;
+        public TextureRegion weaponBow;
+        public TextureRegion weaponSword;
+
     }
 }

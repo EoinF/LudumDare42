@@ -16,24 +16,26 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.Building;
+import com.github.eoinf.game.MapObjectBlueprint;
+import com.github.eoinf.game.Unit;
 import com.github.eoinf.screens.main.controllers.GameScreenController;
 import com.github.eoinf.screens.main.widgets.BuildingActor;
 import com.github.eoinf.screens.main.widgets.BuildingCategory;
 import com.github.eoinf.screens.main.widgets.BuildingsTable;
-import com.github.eoinf.screens.main.widgets.ProductionTable;
+import com.github.eoinf.screens.main.widgets.UnitActor;
 import com.github.eoinf.screens.main.widgets.UnitsTable;
-import org.lwjgl.input.Mouse;
+import com.github.eoinf.utils;
 
 import java.util.Map;
 
 public class Sidebar extends BaseView {
 
     private BuildingsTable buildingsTable;
-    private ProductionTable productionTable;
+//    private ProductionTable productionTable;
     private UnitsTable unitsTable;
 
     private Button buildingsTableButton;
-    private Button productionTableButton;
+//    private Button productionTableButton;
     private Button unitsTableButton;
 
     public Sidebar(int startX, int startY, int width, int height,
@@ -42,7 +44,6 @@ public class Sidebar extends BaseView {
         Table sideBarTable = new Table();
         sideBarTable.setFillParent(true);
         sideBarTable.add(createModeSelectionButtons(textureManager))
-                .expandX().fillX()
                 .top().left();
         sideBarTable.row();
         Table contentsTable = new Table();
@@ -50,19 +51,20 @@ public class Sidebar extends BaseView {
                 .expandX().fillX()
                 .left();
 
-        rootTable.add(sideBarTable);
+        rootTable.add(sideBarTable).expandX().fillX();
 
         // A stack for choosing which mode to enter
         Stack modeSelectStack = new Stack();
 
         buildingsTable = new BuildingsTable(textureManager);
+        buildingsTable.setFillParent(true);
         buildingsTable.top().left().setFillParent(true);
 
-        productionTable = new ProductionTable(textureManager);
-        unitsTable = new UnitsTable();
+//        productionTable = new ProductionTable(textureManager);
+        unitsTable = new UnitsTable(textureManager);
 
         modeSelectStack.add(unitsTable);
-        modeSelectStack.add(productionTable);
+//        modeSelectStack.add(productionTable);
         modeSelectStack.add(buildingsTable);
 
         contentsTable.add(modeSelectStack)
@@ -73,16 +75,19 @@ public class Sidebar extends BaseView {
             @Override
             public void changed(ChangeListener.ChangeEvent event, Actor actor) {
                 buildingsTable.setVisible(buildingsTableButton.isChecked());
-                productionTable.setVisible(productionTableButton.isChecked());
+//                productionTable.setVisible(productionTableButton.isChecked());
                 unitsTable.setVisible(unitsTableButton.isChecked());
 
-                gameScreenController.setSelectedBuilding(null);
+                gameScreenController.setSelectedObject(null);
             }
         };
 
         buildingsTableButton.addListener(onClickModeButton);
-        productionTableButton.addListener(onClickModeButton);
+//        productionTableButton.addListener(onClickModeButton);
         unitsTableButton.addListener(onClickModeButton);
+
+        buildingsTable.setVisible(buildingsTableButton.isChecked());
+        unitsTable.setVisible(unitsTableButton.isChecked());
 
         // Left clicks
         stage.addListener(new ClickListener(Input.Buttons.LEFT) {
@@ -90,8 +95,8 @@ public class Sidebar extends BaseView {
                               public void clicked(InputEvent event, float x, float y) {
                                   Actor hit = stage.hit(x, y, true);
 
-                                  if (hit instanceof BuildingActor) {
-                                      gameScreenController.setSelectedBuilding((Building) hit.getUserObject());
+                                  if (hit instanceof BuildingActor || hit instanceof UnitActor) {
+                                      gameScreenController.setSelectedObject((MapObjectBlueprint) hit.getUserObject());
                                   }
                                   super.clicked(event, x, y);
                               }
@@ -102,7 +107,7 @@ public class Sidebar extends BaseView {
         stage.addListener(new ClickListener(Input.Buttons.RIGHT) {
                               @Override
                               public void clicked(InputEvent event, float x, float y) {
-                                  gameScreenController.setSelectedBuilding(null);
+                                  gameScreenController.setSelectedObject(null);
                                   super.clicked(event, x, y);
                               }
                           }
@@ -117,12 +122,12 @@ public class Sidebar extends BaseView {
         down.getSprite().setColor(Color.YELLOW);
         buildingsTableButton = new Button(new Button.ButtonStyle(up, down, down));
         modeRow.addActor(buildingsTableButton);
-
-        up = new SpriteDrawable(new Sprite(textureManager.ui.iconProduction));
-        down = new SpriteDrawable(new Sprite(textureManager.ui.iconProduction));
-        down.getSprite().setColor(Color.YELLOW);
-        productionTableButton = new Button(new Button.ButtonStyle(up, down, down));
-        modeRow.addActor(productionTableButton);
+//
+//        up = new SpriteDrawable(new Sprite(textureManager.ui.iconProduction));
+//        down = new SpriteDrawable(new Sprite(textureManager.ui.iconProduction));
+//        down.getSprite().setColor(Color.YELLOW);
+//        productionTableButton = new Button(new Button.ButtonStyle(up, down, down));
+//        modeRow.addActor(productionTableButton);
 
         up = new SpriteDrawable(new Sprite(textureManager.ui.iconUnits));
         down = new SpriteDrawable(new Sprite(textureManager.ui.iconUnits));
@@ -132,7 +137,9 @@ public class Sidebar extends BaseView {
 
         //Create a button group to only allow one button being pressed at a time
         ButtonGroup<Button> modeSelectGroup =
-                new ButtonGroup<>(buildingsTableButton, productionTableButton, unitsTableButton);
+                new ButtonGroup<>(buildingsTableButton,
+//                        productionTableButton,
+                        unitsTableButton);
 
         modeSelectGroup.setMaxCheckCount(1);
         modeSelectGroup.setMinCheckCount(1);
@@ -142,5 +149,9 @@ public class Sidebar extends BaseView {
 
     public void setBuildingTemplates(Map<BuildingCategory, Building[]> buildingCategoryMap, int tileWidth, int tileHeight) {
         buildingsTable.setBuildings(buildingCategoryMap, tileWidth, tileHeight);
+    }
+
+    public void setUnitTemplates(Unit[] unitTypes, int tileWidth, int tileHeight, Color playerColour) {
+        unitsTable.setUnits(unitTypes, tileWidth, tileHeight, playerColour);
     }
 }

@@ -72,3 +72,37 @@ ui/iconUnits
   orig: 32, 32
   offset: 0, 0
   index: -1
+
+game4.png
+size: 256,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+units/basicClothes
+  rotate: false
+  xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+units/basicCore
+  rotate: false
+  xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+units/weaponBow
+  rotate: false
+  xy: 70, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+units/weaponSword
+  rotate: false
+  xy: 104, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1

@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.github.eoinf.game.Building;
 import com.github.eoinf.game.BuildingEffect;
 import com.github.eoinf.game.Player;
+import com.github.eoinf.game.Unit;
 import com.github.eoinf.screens.main.views.GameScreen;
 import com.github.eoinf.screens.main.widgets.BuildingCategory;
 
@@ -32,7 +33,8 @@ public class LudumDare42 extends Game {
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("textures/game.atlas"));
         TextureManager textureManager = new TextureManager(atlas, skin);
         batch = new SpriteBatch();
-        gameScreen = new GameScreen(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, batch, textureManager, getBuildingCategories());
+        gameScreen = new GameScreen(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, batch, textureManager, getBuildingCategories(),
+                getUnitTypes());
         setScreen(gameScreen);
     }
 
@@ -46,6 +48,20 @@ public class LudumDare42 extends Game {
     @Override
     public void dispose() {
         batch.dispose();
+    }
+
+    private Unit[] getUnitTypes() {
+        final String VANDAL_DESCRIPTION = "Cost: 8 soldier";
+        final String ARCHER_DESCRIPTION = "Cost: 10 soldier, 4 wood";
+        final String SWORDSMAN_DESCRIPTION = "Cost: 8 soldier, 4 metal";
+        return new Unit[] {
+                new Unit("Vandal", Unit.WeaponType.NONE, VANDAL_DESCRIPTION,
+                        8, 0, 0),
+                new Unit("Swordsman", Unit.WeaponType.SWORD, SWORDSMAN_DESCRIPTION,
+                        8, 4, 0),
+                new Unit("Archer", Unit.WeaponType.BOW_AND_ARROW, ARCHER_DESCRIPTION,
+                        10, 0, 4)
+        };
     }
 
     private Map<BuildingCategory, Building[]> getBuildingCategories() {

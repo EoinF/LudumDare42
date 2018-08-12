@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.GridPoint2;
 /**
  * A blueprint for a building
  */
-public class Building {
+public class Building implements MapObjectBlueprint {
     // The tiles that the building will occupy
     private GridPoint2[] shape;
 
@@ -32,6 +32,10 @@ public class Building {
 
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return effect.getDescription();
     }
 
     public BuildingEffect getEffect() {
