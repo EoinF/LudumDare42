@@ -2,44 +2,131 @@ package com.github.eoinf.screens.main.views;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.Building;
 import com.github.eoinf.screens.main.controllers.GameScreenController;
 import com.github.eoinf.screens.main.widgets.BuildingActor;
 import com.github.eoinf.screens.main.widgets.BuildingCategory;
 import com.github.eoinf.screens.main.widgets.BuildingsTable;
+import com.github.eoinf.screens.main.widgets.ProductionTable;
+import com.github.eoinf.screens.main.widgets.UnitsTable;
 
 import java.util.Map;
 
 public class Sidebar extends BaseView {
 
     private BuildingsTable buildingsTable;
+    private ProductionTable productionTable;
+    private UnitsTable unitsTable;
+
+    private Button buildingsTableButton;
+    private Button productionTableButton;
+    private Button unitsTableButton;
 
     public Sidebar(int startX, int startY, int width, int height,
-                   Batch batch, TextureManager textureManager, GameScreenController gameScreenController,
-                   float viewportWidth, float viewportHeight) {
-        super(startX, startY, width, height, batch, textureManager, viewportWidth, viewportHeight, Color.FIREBRICK);
+                   Batch batch, TextureManager textureManager, GameScreenController gameScreenController) {
+        super(startX, startY, width, height, batch, textureManager, Color.FIREBRICK);
+        Table sideBarTable = new Table();
+        sideBarTable.setFillParent(true);
+        sideBarTable.add(createModeSelectionButtons(textureManager))
+                .expandX().fillX()
+                .top().left();
+        sideBarTable.row();
+        Table contentsTable = new Table();
+        sideBarTable.add(contentsTable)
+                .expandX().fillX()
+                .left();
+
+        rootTable.add(sideBarTable);
+
+        // A stack for choosing which mode to enter
+        Stack modeSelectStack = new Stack();
 
         buildingsTable = new BuildingsTable(textureManager);
         buildingsTable.top().left().setFillParent(true);
-        rootTable.addActor(buildingsTable);
-        stage.addListener(new InputListener(){
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Actor hit = stage.hit(x, y, true);
 
-                if (hit instanceof BuildingActor) {
-                    gameScreenController.setSelectedBuilding((Building)hit.getUserObject());
-                }
-                return super.touchDown(event, x, y, pointer, button);
+        productionTable = new ProductionTable(textureManager);
+        unitsTable = new UnitsTable();
+
+        modeSelectStack.add(unitsTable);
+        modeSelectStack.add(productionTable);
+        modeSelectStack.add(buildingsTable);
+
+        contentsTable.add(modeSelectStack)
+                .expandX()
+                .fillX();
+
+        ChangeListener onClickModeButton = new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                buildingsTable.setVisible(buildingsTableButton.isChecked());
+                productionTable.setVisible(productionTableButton.isChecked());
+                unitsTable.setVisible(unitsTableButton.isChecked());
             }
-        });
+        };
+
+        buildingsTableButton.addListener(onClickModeButton);
+        productionTableButton.addListener(onClickModeButton);
+        unitsTableButton.addListener(onClickModeButton);
+
+        stage.addListener(new ClickListener() {
+                              @Override
+                              public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                                  System.out.println("touch down");
+                                  Actor hit = stage.hit(x, y, true);
+
+                                  if (hit instanceof BuildingActor) {
+                                      gameScreenController.setSelectedBuilding((Building) hit.getUserObject());
+                                  }
+                                  return super.touchDown(event, x, y, pointer, button);
+                              }
+                          }
+        );
     }
 
-    public void setBuildings(Map<BuildingCategory, Building[]> buildingCategoryMap, int tileWidth, int tileHeight) {
+    private HorizontalGroup createModeSelectionButtons(TextureManager textureManager) {
+        HorizontalGroup modeRow = new HorizontalGroup();
+
+        SpriteDrawable up = new SpriteDrawable(new Sprite(textureManager.ui.iconBuildings));
+        SpriteDrawable down = new SpriteDrawable(new Sprite(textureManager.ui.iconBuildings));
+        down.getSprite().setColor(Color.YELLOW);
+        buildingsTableButton = new Button(new Button.ButtonStyle(up, down, down));
+        modeRow.addActor(buildingsTableButton);
+
+        up = new SpriteDrawable(new Sprite(textureManager.ui.iconProduction));
+        down = new SpriteDrawable(new Sprite(textureManager.ui.iconProduction));
+        down.getSprite().setColor(Color.YELLOW);
+        productionTableButton = new Button(new Button.ButtonStyle(up, down, down));
+        modeRow.addActor(productionTableButton);
+
+        up = new SpriteDrawable(new Sprite(textureManager.ui.iconUnits));
+        down = new SpriteDrawable(new Sprite(textureManager.ui.iconUnits));
+        down.getSprite().setColor(Color.YELLOW);
+        unitsTableButton = new Button(new Button.ButtonStyle(up, down, down));
+        modeRow.addActor(unitsTableButton);
+
+        //Create a button group to only allow one button being pressed at a time
+        ButtonGroup<Button> modeSelectGroup =
+                new ButtonGroup<>(buildingsTableButton, productionTableButton, unitsTableButton);
+
+        modeSelectGroup.setMaxCheckCount(1);
+        modeSelectGroup.setMinCheckCount(1);
+        buildingsTableButton.setChecked(true);
+        return modeRow;
+    }
+
+    public void setBuildingTemplates(Map<BuildingCategory, Building[]> buildingCategoryMap, int tileWidth, int tileHeight) {
         buildingsTable.setBuildings(buildingCategoryMap, tileWidth, tileHeight);
     }
 }

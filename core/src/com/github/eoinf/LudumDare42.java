@@ -68,7 +68,7 @@ public class LudumDare42 extends Game {
 						new GridPoint2(1, 1),
 						new GridPoint2(2, 1),
 						new GridPoint2(3, 1)
-				}, Building.BuildingType.COTTAGE)
+				}, Building.BuildingType.BARRACKS)
 		});
 		return categoryMap;
 	}

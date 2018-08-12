@@ -1,5 +1,10 @@
 package com.github.eoinf.game;
 
+import com.badlogic.gdx.math.GridPoint2;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class GameMap {
     private int width;
     private int height;
@@ -30,6 +35,14 @@ public class GameMap {
         return tiles;
     }
 
+    public MapTile getTile(int x, int y) {
+        if (x >= 0 && x < width && y >= 0 && y < height) {
+            return tiles[x][y];
+        } else {
+            return null;
+        }
+    }
+
     private int getOwnerAt(int i, int j) {
         if (j >= 0 && j < TILE_OWNED_CUTOFF) {
             return players[0].getId();
@@ -54,5 +67,23 @@ public class GameMap {
 
     public int getWidth() {
         return width;
+    }
+
+    public boolean canConstructBuilding(Building building, int tileX, int tileY, int playerId) {
+        for (GridPoint2 point : building.getShape()) {
+            MapTile tile = getTile(tileX + point.x, tileY + point.y);
+            if (tile == null || !tile.isOwnedBy(playerId) || tile.getBuilding() != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public List<MapTile> getBuildingTiles(Building building, int tileX, int tileY) {
+        List<MapTile> tiles = new ArrayList<>();
+        for (GridPoint2 point: building.getShape()) {
+            tiles.add(getTile(tileX + point.x, tileY + point.y));
+        }
+        return tiles;
     }
 }

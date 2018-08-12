@@ -1,12 +1,19 @@
 
 game.png
-size: 128,128
+size: 256,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-buildings/cottage
+buildings/barracks
   rotate: false
   xy: 2, 2
+  size: 128, 64
+  orig: 128, 64
+  offset: 0, 0
+  index: -1
+buildings/cottage
+  rotate: false
+  xy: 132, 2
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
@@ -32,6 +39,33 @@ tiles/border
   offset: 0, 0
   index: -1
 tiles/grass
+  rotate: false
+  xy: 70, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+
+game3.png
+size: 128,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+ui/iconBuildings
+  rotate: false
+  xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+ui/iconProduction
+  rotate: false
+  xy: 36, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+ui/iconUnits
   rotate: false
   xy: 70, 2
   size: 32, 32

@@ -6,8 +6,7 @@ import com.github.eoinf.TextureManager;
 
 public class Infobar extends BaseView {
 
-    public Infobar(int startX, int startY, int width, int height, Batch batch, TextureManager textureManager,
-                   float viewportWidth, float viewportHeight) {
-        super(startX, startY, width, height, batch, textureManager, viewportWidth, viewportHeight, Color.FIREBRICK);
+    public Infobar(int startX, int startY, int width, int height, Batch batch, TextureManager textureManager) {
+        super(startX, startY, width, height, batch, textureManager, Color.FIREBRICK);
     }
 }

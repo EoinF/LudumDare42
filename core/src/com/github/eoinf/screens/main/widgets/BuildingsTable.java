@@ -25,7 +25,7 @@ public class BuildingsTable extends Table {
         row();
 
         housingTable = new Table();
-        add(housingTable);
+        add(housingTable).left();
         row();
 
         label = new Label("Military", textureManager.skin);
@@ -34,7 +34,7 @@ public class BuildingsTable extends Table {
         row();
 
         militaryTable = new Table();
-        add(militaryTable);
+        add(militaryTable).left();
         row();
     }
 
@@ -47,15 +47,15 @@ public class BuildingsTable extends Table {
         }
 
         //
-        // Workshops
+        // Military
         //
         for (Building building: buildingCategoryMap.get(BuildingCategory.MILITARY)) {
             addBuildingRow(tileWidth, tileHeight, building, militaryTable);
         }
     }
 
-    private void addBuildingRow(int tileWidth, int tileHeight, Building building, Table militaryTable) {
-        militaryTable.add(new Label(building.getName(), textureManager.skin)).top();
+    private void addBuildingRow(int tileWidth, int tileHeight, Building building, Table categoryTable) {
+        categoryTable.add(new Label(building.getName(), textureManager.skin)).top();
 
         BuildingActor buildingWidget = new BuildingActor(this.textureManager, building);
 
@@ -65,7 +65,7 @@ public class BuildingsTable extends Table {
             tileImage.setColor(1, 1, 1, 0.5f);
             buildingWidget.addActor(tileImage);
         }
-        militaryTable.add(buildingWidget);
+        categoryTable.add(buildingWidget);
         row();
     }
 

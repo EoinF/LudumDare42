@@ -7,46 +7,54 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.github.eoinf.TextureManager;
+import com.github.eoinf.game.ConstructedBuilding;
 import com.github.eoinf.utils;
+
+import java.util.List;
 
 public abstract class BaseView {
     Stage stage;
-    FitViewport viewport;
+    private FitViewport viewport;
     OrthographicCamera camera;
     TextureManager textureManager;
+    protected int screenX, screenY;
 
     protected Table rootTable;
 
     public BaseView(int startX, int startY, int width, int height,
-                    Batch batch, TextureManager textureManager,
-                    float viewportWidth, float viewportHeight) {
-        this.camera = new OrthographicCamera(viewportWidth, viewportHeight);
-        this.viewport = new FitViewport(viewportWidth, viewportHeight, camera);
+                    Batch batch, TextureManager textureManager) {
+        this.screenX = startX;
+        this.screenY = startY;
+        this.camera = new OrthographicCamera(width, height);
+        this.viewport = new FitViewport(width, height, camera);
+        viewport.setScreenBounds(startX, startY, width, height);
         this.stage = new Stage(viewport, batch);
         this.textureManager = textureManager;
-        initRootTable(startX, startY, width, height);
+        initRootTable();
     }
 
     public BaseView(int startX, int startY, int width, int height,
                     Batch batch, TextureManager textureManager,
-                    float viewportWidth, float viewportHeight,
                     Color colour) {
-        this.camera = new OrthographicCamera(viewportWidth, viewportHeight);
-        this.viewport = new FitViewport(viewportWidth, viewportHeight, camera);
+        this.screenX = startX;
+        this.screenY = startY;
+        this.camera = new OrthographicCamera(width, height);
+        this.viewport = new FitViewport(width, height, camera);
+        viewport.setScreenBounds(startX, startY, width, height);
         this.stage = new Stage(viewport, batch);
         this.textureManager = textureManager;
-        initRootTable(startX, startY, width, height, colour);
+        initRootTable(colour);
     }
 
-    private void initRootTable(int startX, int startY, int width, int height) {
+    private void initRootTable() {
         rootTable = new Table();
-        rootTable.setBounds(startX, startY, width, height);
+        rootTable.setFillParent(true);
         stage.addActor(rootTable);
     }
 
-    private void initRootTable(int startX, int startY, int width, int height, Color colour) {
+    private void initRootTable(Color colour) {
         rootTable = new Table();
-        rootTable.setBounds(startX, startY, width, height);
+        rootTable.setFillParent(true);
         utils.setBackgroundColour(rootTable, colour);
         stage.addActor(rootTable);
     }
@@ -56,6 +64,8 @@ public abstract class BaseView {
     }
 
     public void render() {
+        viewport.apply();
+        viewport.setScreenPosition(screenX, screenY);
         stage.draw();
     }
 }

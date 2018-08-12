@@ -15,9 +15,16 @@ public class TextureManager {
     private static final String TILE_BLANK = "tiles/blank";
 
     private static final String BUILDING_COTTAGE = "buildings/cottage";
+    private static final String BUILDING_BARRACKS = "buildings/barracks";
+
+
+    private static final String ICON_BUILDINGS = "ui/iconBuildings";
+    private static final String ICON_PRODUCTION = "ui/iconProduction";
+    private static final String ICON_UNITS = "ui/iconUnits";
 
     public TileTextures tiles;
     public BuildingTextures buildings;
+    public UITextures ui;
     public Skin skin;
 
     public TextureManager(TextureAtlas atlas, Skin skin) {
@@ -38,7 +45,15 @@ public class TextureManager {
         buildings.setByType(Building.BuildingType.COTTAGE,
                 loadRegion(atlas, BUILDING_COTTAGE));
         buildings.setByType(Building.BuildingType.BARRACKS,
-                loadRegion(atlas, BUILDING_COTTAGE));
+                loadRegion(atlas, BUILDING_BARRACKS));
+
+        //
+        // UI
+        //
+        this.ui = new UITextures();
+        ui.iconBuildings = loadRegion(atlas, ICON_BUILDINGS);
+        ui.iconProduction = loadRegion(atlas, ICON_PRODUCTION);
+        ui.iconUnits = loadRegion(atlas, ICON_UNITS);
     }
 
     private TextureRegion loadRegion(TextureAtlas atlas, String index) {
@@ -67,5 +82,11 @@ public class TextureManager {
         private void setByType(Building.BuildingType type, TextureRegion textureRegion) {
             textureRegionMap.put(type, textureRegion);
         }
+    }
+
+    public class UITextures {
+        public TextureRegion iconBuildings;
+        public TextureRegion iconProduction;
+        public TextureRegion iconUnits;
     }
 }

@@ -18,4 +18,8 @@ public class Player {
     public Color getColour() {
         return colour;
     }
+
+    public boolean canConstructBuilding(Building building) {
+        return true;
+    }
 }
