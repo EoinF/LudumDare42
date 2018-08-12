@@ -29,7 +29,7 @@ public class LudumDare42 extends Game {
         FileHandle f = Gdx.files.internal("skin/Holo-dark-hdpi.json");
         Skin skin = new Skin(f);
         skin.getFont("default-font").getData().setScale(0.5f, 0.5f);
-        TextureAtlas atlas = new TextureAtlas(new FileHandle("textures/game.atlas"));
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("textures/game.atlas"));
         TextureManager textureManager = new TextureManager(atlas, skin);
         batch = new SpriteBatch();
         gameScreen = new GameScreen(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, batch, textureManager, getBuildingCategories());

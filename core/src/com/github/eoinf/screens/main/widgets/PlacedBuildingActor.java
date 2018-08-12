@@ -10,6 +10,7 @@ public class PlacedBuildingActor extends Group {
     private static final Color PLACED_COLOUR = new Color(0.6f, 0.2f, 1f, 1f);
 
     public PlacedBuildingActor(TextureManager textureManager, PlacedBuilding placedBuilding) {
+        setTransform(false); // Avoids triggering a flush of spritebatch on drawing this
         Image buildingImage = new Image(textureManager.buildings.getByType(placedBuilding.getBuilding().getType()));
         if (!placedBuilding.isConstructed()) {
             buildingImage.setColor(PLACED_COLOUR);

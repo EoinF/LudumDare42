@@ -11,6 +11,7 @@ public class MapTileActor extends Group {
 
     public void setTile(TextureManager textureManager, MapTile tile, Player[] players) {
         clear();
+        setTransform(false);
         addBackground(textureManager);
         addBorder(textureManager, tile, players);
     }
