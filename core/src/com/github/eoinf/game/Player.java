@@ -5,32 +5,30 @@ import com.badlogic.gdx.graphics.Color;
 public class Player {
     private int id;
     private Color colour;
-    public int peopleCount;
-    public int soliderCount;
-    public int metalCount;
-    public int woodCount;
+
+    public Resource people;
+    public Resource soldier;
+    public Resource metal;
+    public Resource wood;
 
     public void resetResourceUsage() {
-        peopleUsed = 0;
-        soliderUsed = 0;
-        metalUsed = 0;
-        woodUsed = 0;
+        people.delta = 0;
+        soldier.delta = 0;
+        metal.delta = 0;
+        wood.delta = 0;
+        people.used = 0;
+        soldier.used = 0;
+        metal.used = 0;
+        wood.used = 0;
     }
-    //
-    // Resources already utilized this turn
-    //
-    public int peopleUsed;
-    public int soliderUsed;
-    public int metalUsed;
-    public int woodUsed;
 
     public Player(int id, Color colour, int startingPeople) {
         this.id = id;
         this.colour = colour;
-        this.peopleCount = startingPeople;
-        this.soliderCount = 0;
-        this.metalCount = 0;
-        this.woodCount = 0;
+        this.people = new Resource(startingPeople);
+        this.soldier = new Resource(0);
+        this.metal = new Resource(0);
+        this.wood = new Resource(0);
         resetResourceUsage();
     }
 
@@ -43,6 +41,13 @@ public class Player {
     }
 
     public boolean canConstructBuilding(Building building) {
-        return building.getPeopleRequired() < peopleCount - peopleUsed;
+        return building.getPeopleRequired() <= people.amountAvailable();
+    }
+
+    public void collectNewResources() {
+        this.people.total += this.people.delta;
+        this.soldier.total += this.soldier.delta;
+        this.metal.total += this.metal.delta;
+        this.wood.total += this.wood.delta;
     }
 }

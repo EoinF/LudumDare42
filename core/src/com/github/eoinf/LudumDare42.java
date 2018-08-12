@@ -65,7 +65,7 @@ public class LudumDare42 extends Game {
         }, Building.BuildingType.COTTAGE, new BuildingEffect(COTTAGE_DESCRIPTION) {
             @Override
             public void applyTo(Player player) {
-                player.peopleCount++;
+                player.people.delta++;
             }
         }, 1);
 
@@ -88,10 +88,10 @@ public class LudumDare42 extends Game {
         }, Building.BuildingType.BARRACKS, new BuildingEffect(BARRACKS_DESCRIPTION) {
             @Override
             public void applyTo(Player player) {
-                player.peopleCount -= 2;
-                player.soliderCount++;
+                player.people.delta -= 2;
+                player.soldier.delta++;
             }
-        }, 1);
+        }, 5);
 
         categoryMap.put(BuildingCategory.MILITARY, new Building[]{
                 barracks

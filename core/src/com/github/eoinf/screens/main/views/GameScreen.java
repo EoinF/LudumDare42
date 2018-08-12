@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.github.eoinf.TextureManager;
+import com.github.eoinf.game.AIController;
 import com.github.eoinf.game.Building;
 import com.github.eoinf.game.ConstructedBuilding;
 import com.github.eoinf.game.GameMap;
@@ -17,6 +18,7 @@ import com.github.eoinf.screens.main.widgets.BuildingCategory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class GameScreen implements Screen {
 
@@ -26,26 +28,31 @@ public class GameScreen implements Screen {
 
     GameScreenController gameScreenController;
     StateManager stateManager;
+    AIController ai;
 
     private static final int SIDEBAR_WIDTH = 256;
-    private static final int INFO_BAR_WIDTH = 512;
+    private static final int INFO_BAR_WIDTH = 900;
     private static final int INFO_BAR_HEIGHT = 32;
     private static final int TILE_WIDTH = 32;
     private static final int TILE_HEIGHT = 32;
 
     private static final int HUMAN_PLAYER_ID = 0;
+    private static final int AI_PLAYER_ID = 1;
 
     public GameScreen(int viewportWidth, int viewportHeight, Batch batch, TextureManager textureManager,
                       Map<BuildingCategory, Building[]> buildingCategoryMap) {
         Player[] players = new Player[2];
-        players[0] = new Player(HUMAN_PLAYER_ID, Color.BLUE, 1);
-        players[1] = new Player(1, Color.RED, 1);
+        players[0] = new Player(HUMAN_PLAYER_ID, Color.BLUE, 1000);
+        players[1] = new Player(AI_PLAYER_ID, Color.RED, 1);
+
         List<ConstructedBuilding> gameBuildings = new ArrayList<>();
 
         GameMap gameMap = new GameMap(32, 25, TILE_WIDTH, TILE_HEIGHT, players);
         this.gameScreenController = new GameScreenController(gameMap, players);
 
         stateManager = new StateManager(players, gameMap, gameBuildings, gameScreenController);
+
+        ai = new AIController(AI_PLAYER_ID, players, gameBuildings, stateManager, gameScreenController);
 
         createViews(batch, textureManager, viewportWidth, viewportHeight, buildingCategoryMap);
 
@@ -75,6 +82,7 @@ public class GameScreen implements Screen {
         }
 
         InputMultiplexer mux = new InputMultiplexer(
+                this.infoBar.stage,
                 this.mainView.stage,
                 this.sidebar.stage
         );
@@ -82,6 +90,18 @@ public class GameScreen implements Screen {
     }
 
     private void startGame() {
+        gameScreenController.subscribeOnConstructBuilding(new Consumer<ConstructedBuilding>() {
+            @Override
+            public void accept(ConstructedBuilding constructedBuilding) {
+                for (Player player: stateManager.getPlayers()) {
+                    if (constructedBuilding.getOwner() == player.getId()) {
+                        player.people.used += constructedBuilding.getBuilding().getPeopleRequired();
+                        gameScreenController.changePlayer(player);
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     private void spawnTrees() {
@@ -97,6 +117,9 @@ public class GameScreen implements Screen {
         mainView.update(delta);
         sidebar.update(delta);
         infoBar.update(delta);
+
+        stateManager.update();
+        ai.update();
     }
 
     @Override

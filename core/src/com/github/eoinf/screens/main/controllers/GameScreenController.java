@@ -24,6 +24,7 @@ public class GameScreenController {
         this.constructBuildingObservers = new ArrayList<>();
         this.stateObservers = new ArrayList<>();
         this.playerObservers = new ArrayList<>();
+        this.endTurnObservers = new ArrayList<>();
     }
 
     //
@@ -72,6 +73,7 @@ public class GameScreenController {
         for (Player p : this.players) {
             if (p.getId() == owner) {
                 player = p;
+                break;
             }
         }
         if (gameMap.canConstructBuilding(building, tileX, tileY, owner)
@@ -115,6 +117,24 @@ public class GameScreenController {
     public void changePlayer(Player player) {
         for (Consumer<Player> observer : playerObservers) {
             observer.accept(player);
+        }
+    }
+
+
+    //
+    // Change Player (i.e. resource counts)
+    //
+    private List<Consumer<Integer>> endTurnObservers;
+
+    public void subscribeOnEndTurn(Consumer<Integer> onEndTurn) {
+        this.endTurnObservers.add(onEndTurn);
+    }
+
+
+    public void endPlayerTurn(int playerId) {
+        System.out.println("Ending turn for player " + playerId);
+        for (Consumer<Integer> observer : endTurnObservers) {
+            observer.accept(playerId);
         }
     }
 }
