@@ -29,5 +29,10 @@
               }
               document.getElementById('embed-html').addEventListener('mousedown', handleMouseDown, false);
               document.getElementById('embed-html').addEventListener('mouseup', handleMouseUp, false);
+              // Disable context menu on right clicks
+              var embedHtml = document.getElementById("embed-html");
+              embedHtml.oncontextmenu = function(e) {
+                  e.preventDefault();
+              }
        </script>
 </html>
