@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.Building;
 import com.github.eoinf.game.MapObjectBlueprint;
@@ -137,6 +138,10 @@ public class SelectedObjectActor extends Group {
                 addActor(selectedBuildingTile);
                 tilesMap.put(tileOccupied, selectedBuildingTile);
             }
+
+            Label descriptionLabel = new Label(object.getDescription(), textureManager.skin);
+            descriptionLabel.setPosition(0, 50);
+            addActor(descriptionLabel);
         }
     }
 

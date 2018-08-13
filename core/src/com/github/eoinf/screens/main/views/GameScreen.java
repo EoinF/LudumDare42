@@ -102,7 +102,12 @@ public class GameScreen implements Screen {
         gameScreenController.subscribeOnPlaceBuilding(new Consumer<PlacedBuilding>() {
             @Override
             public void accept(PlacedBuilding constructedBuilding) {
-                constructedBuilding.getOriginTile().setBuilding(constructedBuilding);
+                int tileX = constructedBuilding.getOriginTile().getX();
+                int tileY = constructedBuilding.getOriginTile().getY();
+                for (GridPoint2 offset: constructedBuilding.getBuilding().getShape()) {
+                    stateManager.getMap().getTile(tileX + offset.x, tileY + offset.y).setBuilding(constructedBuilding);
+                }
+
                 for (Player player: stateManager.getPlayers()) {
                     if (constructedBuilding.getOwner() == player.getId()) {
                         player.people.used += constructedBuilding.getBuilding().getPeopleRequired();
@@ -130,26 +135,35 @@ public class GameScreen implements Screen {
         spawnTrees();
     }
 
-    private void spawnTrees() {
-        Building tree = new Building("Tree", new GridPoint2[]{new GridPoint2(0, 0)},
-                Building.BuildingType.TREE,
-                new BuildingEffect("") {
-                    @Override
-                    public void applyTo(Player player) {
 
-                    }
-                },
-                4
-        );
-        int x = 0;
-        int y = 0;
+    private void spawnTrees() {
+
+        int x, y;
 
         Random random = new Random();
         for (int i = 0; i < 90; i++) {
             x = random.nextInt(stateManager.getMap().getWidth());
             y = random.nextInt(stateManager.getMap().getHeight());
-            MapTile tile = stateManager.getMap().getTile(x, y);
+            spawnTree(x, y);
+        }
+    }
+    boolean spawnTree(int x, int y) {
+        final Building tree = new Building("Tree", new GridPoint2[]{new GridPoint2(0, 0)},
+                Building.BuildingType.TREE,
+                new BuildingEffect("") {
+                    @Override
+                    public void applyTo(Player player) {
+                    }
+                },
+                4
+        );
+        MapTile tile = stateManager.getMap().getTile(x, y);
+        if (tile.getBuilding() == null) {
             gameScreenController.placeBuilding(tree, tile, -1);
+            return true;
+        }
+        else {
+            return false;
         }
     }
 

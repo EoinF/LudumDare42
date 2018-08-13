@@ -3,6 +3,7 @@ package com.github.eoinf.screens.main.views;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -171,8 +172,14 @@ public class MainView extends BaseView {
                     selectedPlacedObjectActor.clearPlacedObject();
                 }
                 if (placedObject instanceof PlacedBuilding) {
-                    selectedObjectActor.removePlacedBuilding((PlacedBuilding) placedObject);
-                    removeBuilding((PlacedBuilding)placedObject);
+                    PlacedBuilding razedBuilding = (PlacedBuilding) placedObject;
+                    int tileX = razedBuilding.getOriginTile().getX();
+                    int tileY = razedBuilding.getOriginTile().getY();
+                    for (GridPoint2 offset: razedBuilding.getBuilding().getShape()) {
+                        gameMap.getTile(tileX + offset.x, tileY + offset.y).setBuilding(null);
+                    }
+                    selectedObjectActor.removePlacedBuilding(razedBuilding);
+                    removeBuilding(razedBuilding);
                 } else {
                     removeUnit((PlacedUnit)placedObject);
                 }

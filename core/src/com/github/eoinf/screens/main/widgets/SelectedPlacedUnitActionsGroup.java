@@ -35,6 +35,7 @@ public class SelectedPlacedUnitActionsGroup extends Group {
             };
             actionsGroup.addActor(moveButton);
 
+            int currentButtonsOffset = 64;
             if (placedUnit.getUnit().getWeapon() != Unit.WeaponType.NONE) {
                 ActionButton attackButton = new ActionButton("Attack", textureManager.skin) {
                     @Override
@@ -46,8 +47,9 @@ public class SelectedPlacedUnitActionsGroup extends Group {
                     }
                 };
 
-                attackButton.setPosition(64, 0);
+                attackButton.setPosition(currentButtonsOffset, 0);
                 actionsGroup.addActor(attackButton);
+                currentButtonsOffset += 64;
             }
 
             if (placedUnit.getOriginTile().getBuilding() != null &&
@@ -60,7 +62,7 @@ public class SelectedPlacedUnitActionsGroup extends Group {
                     }
                 };
 
-                attackButton.setPosition(64, 0);
+                attackButton.setPosition(currentButtonsOffset, 0);
                 actionsGroup.addActor(attackButton);
             }
         }
