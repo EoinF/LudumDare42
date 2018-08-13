@@ -102,6 +102,7 @@ public class GameScreen implements Screen {
         gameScreenController.subscribeOnPlaceBuilding(new Consumer<PlacedBuilding>() {
             @Override
             public void accept(PlacedBuilding constructedBuilding) {
+                constructedBuilding.getOriginTile().setBuilding(constructedBuilding);
                 for (Player player: stateManager.getPlayers()) {
                     if (constructedBuilding.getOwner() == player.getId()) {
                         player.people.used += constructedBuilding.getBuilding().getPeopleRequired();

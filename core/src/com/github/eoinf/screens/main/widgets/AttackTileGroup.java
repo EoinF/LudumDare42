@@ -7,6 +7,8 @@ import com.github.eoinf.game.MapTile;
 import com.github.eoinf.game.PlacedUnit;
 import com.github.eoinf.screens.main.controllers.GameScreenController;
 
+import static com.github.eoinf.game.Unit.WeaponType.BOW_AND_ARROW;
+
 public class AttackTileGroup extends Group {
     public AttackTileGroup(PlacedUnit placedUnit, TextureManager textureManager, GameMap gameMap, GameScreenController gameScreenController) {
         MapTile originTile = placedUnit.getOriginTile();
@@ -18,6 +20,34 @@ public class AttackTileGroup extends Group {
         addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY);
         addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX, tileY - 1);
         addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY + 1);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY - 1);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY - 1);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY + 1);
+
+        if (placedUnit.getUnit().getWeapon() == BOW_AND_ARROW) {
+
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY - 2);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY - 2);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX, tileY - 2);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY - 2);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY - 2);
+
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY + 2);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY + 2);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX, tileY + 2);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY + 2);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY + 2);
+
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY - 1);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY - 1);
+
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY);
+
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY + 1);
+            addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY + 1);
+        }
     }
 
     void addTileAt(PlacedUnit placedUnit, GameMap gameMap, GameScreenController gameScreenController,

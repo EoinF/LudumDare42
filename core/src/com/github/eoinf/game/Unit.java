@@ -56,9 +56,18 @@ public class Unit implements MapObjectBlueprint {
         return woodCost;
     }
 
+    public int getStrength() {
+        return weapon.getValue();
+    }
+
     public enum WeaponType {
-        NONE,
-        SWORD,
-        BOW_AND_ARROW
+        NONE(0),
+        SWORD(2),
+        BOW_AND_ARROW(1);
+
+        private final int id;
+        WeaponType(int id) { this.id = id; }
+        public int getValue() { return id; }
+
     }
 }

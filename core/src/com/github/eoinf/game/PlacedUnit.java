@@ -9,6 +9,7 @@ public class PlacedUnit implements PlacedObject{
 
     private MapTile destinationTile;
     private MapTile targetTile;
+    private PlacedBuilding razeTarget;
 
     public PlacedUnit(Unit unit, MapTile originTile, int owner, boolean isDeployed) {
         this.isDeployed = isDeployed;
@@ -44,9 +45,6 @@ public class PlacedUnit implements PlacedObject{
         return unit;
     }
 
-    public void setDestinationTile(MapTile tile) {
-        destinationTile = tile;
-    }
 
     public void setMapLocation(MapTile tile) {
         this.originTile = tile;
@@ -68,7 +66,29 @@ public class PlacedUnit implements PlacedObject{
         isAlive = alive;
     }
 
+    public void setDestinationTile(MapTile tile) {
+        this.destinationTile = tile;
+        this.razeTarget = null;
+        this.targetTile = null;
+    }
+
     public void setTarget(MapTile tile) {
         this.targetTile = tile;
+        this.razeTarget = null;
+        this.destinationTile = null;
+    }
+
+    public void setRazeTarget(PlacedBuilding building) {
+        this.razeTarget = building;
+        this.targetTile = null;
+        this.destinationTile = null;
+    }
+
+    public PlacedBuilding getRazeTarget() {
+        return razeTarget;
+    }
+
+    public void resetTargets() {
+        setTarget(null);
     }
 }

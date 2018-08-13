@@ -1,7 +1,5 @@
 package com.github.eoinf.game;
 
-import com.badlogic.gdx.math.GridPoint2;
-
 public class MapTile {
     private int x;
     private int y;
@@ -10,8 +8,7 @@ public class MapTile {
     private int ownerId;
     public static final int NO_OWNER = -1;
 
-    private Building building;
-    private GridPoint2 buildingOffset;
+    private PlacedBuilding building;
 
     public int getX() {
         return x;
@@ -34,16 +31,11 @@ public class MapTile {
         return id == ownerId;
     }
 
-    public void setBuildingPart(Building building, int offsetX, int offsetY) {
+    public void setBuilding(PlacedBuilding building) {
         this.building = building;
-        this.buildingOffset = new GridPoint2(offsetX, offsetY);
     }
 
-    public Building getBuilding() {
+    public PlacedBuilding getBuilding() {
         return building;
-    }
-
-    public GridPoint2 getBuildingOffset() {
-        return buildingOffset;
     }
 }

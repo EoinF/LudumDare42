@@ -2,6 +2,7 @@ package com.github.eoinf.game;
 
 import com.github.eoinf.screens.main.controllers.GameScreenController;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -140,8 +141,16 @@ public class StateManager {
         for (PlacedUnit movingUnit : units) {
             MapTile destination = movingUnit.getDestinationTile();
             if (destination != null) {
-                movingUnit.setMapLocation(destination);
-                gameScreenController.changeUnit(movingUnit);
+
+                PlacedUnit occupier = getTileOccupier(movingUnit);
+                //
+                // Units can't occupy the same tile so don't allow allied units to move into the same tile
+                // Enemies that move into the same tile are dealt with in a later phase
+                //
+                if (occupier == null || occupier.getOwner() != movingUnit.getOwner()) {
+                    movingUnit.setMapLocation(destination);
+                    gameScreenController.changeUnit(movingUnit);
+                }
             }
         }
 
@@ -156,21 +165,77 @@ public class StateManager {
                         if (otherUnit != archer
                                 && otherUnit.getOriginTile() == attackTarget) {
                             otherUnit.setAlive(false);
-                            gameScreenController.changeUnit(otherUnit);
                         }
                     }
                 }
             }
         }
 
+        // Then position conflicts are checked
+        for (PlacedUnit unit: units) {
+            for (PlacedUnit otherUnit: units) {
+                if (unit.getOwner() != otherUnit.getOwner()
+                        && unit.getOriginTile() == otherUnit.getOriginTile()) {
+                    int unitStrength = unit.getUnit().getStrength();
+                    int otherUnitStrength = otherUnit.getUnit().getStrength();
+                    if (unitStrength > otherUnitStrength) {
+                        otherUnit.setAlive(false);
+                    } else if (otherUnitStrength > unitStrength){
+                        unit.setAlive(false);
+                    } else {
+                        unit.setAlive(false);
+                        otherUnit.setAlive(false);
+                    }
+                }
+            }
+        }
+
+        List<PlacedUnit> unitsToRemove = new ArrayList<>();
         //
         // Then units die
         //
         for (PlacedUnit unit : units) {
             if (!unit.isAlive()) {
-                gameScreenController.destroyPlacedObject(unit);
+                unitsToRemove.add(unit);
             }
         }
+
+        for (PlacedUnit toRemove: unitsToRemove) {
+            gameScreenController.destroyPlacedObject(toRemove);
+            units.remove(toRemove);
+        }
+
+        for (PlacedUnit unit: units) {
+            //
+            // Then buildings are razed
+            //
+            if (unit.getRazeTarget() != null) {
+                gameScreenController.destroyPlacedObject(unit.getRazeTarget());
+            }
+
+            // And reset all targets
+            unit.resetTargets();
+            gameScreenController.changeUnit(unit);
+        }
+
+    }
+
+    private PlacedUnit getTileOccupier(PlacedUnit movingUnit) {
+        MapTile destination = movingUnit.getDestinationTile();
+        for (PlacedUnit otherUnit : units) {
+            if (movingUnit != otherUnit) {
+                if (otherUnit.getDestinationTile() != null) {
+                    if (otherUnit.getDestinationTile() == destination) {
+                        return otherUnit;
+                    }
+                } else {
+                    if (otherUnit.getOriginTile() == destination) {
+                        return otherUnit;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private void productionPhase() {

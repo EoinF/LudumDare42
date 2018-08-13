@@ -19,6 +19,31 @@ public class MovementTileGroup extends Group {
         addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY);
         addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX, tileY - 1);
         addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY + 1);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY - 1);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY - 1);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY + 1);
+
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY - 2);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY - 2);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX, tileY - 2);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY - 2);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY - 2);
+
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY + 2);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 1, tileY + 2);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX, tileY + 2);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 1, tileY + 2);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY + 2);
+
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY - 1);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY - 1);
+
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY);
+
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX - 2, tileY + 1);
+        addTileAt(placedUnit, gameMap, gameScreenController, textureManager, tileX + 2, tileY + 1);
     }
 
     void addTileAt(PlacedUnit placedUnit, GameMap gameMap, GameScreenController gameScreenController,
