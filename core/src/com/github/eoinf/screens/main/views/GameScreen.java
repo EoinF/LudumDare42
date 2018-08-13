@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.GridPoint2;
+import com.github.eoinf.LudumDare42;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.AIController;
 import com.github.eoinf.game.Building;
@@ -42,11 +43,13 @@ public class GameScreen implements Screen {
     private static final int TILE_WIDTH = 32;
     private static final int TILE_HEIGHT = 32;
 
-    private static final int HUMAN_PLAYER_ID = 0;
+    public static final int HUMAN_PLAYER_ID = 0;
     private static final int AI_PLAYER_ID = 1;
+    private LudumDare42 game;
 
-    public GameScreen(int viewportWidth, int viewportHeight, Batch batch, TextureManager textureManager,
+    public GameScreen(LudumDare42 game, int viewportWidth, int viewportHeight, Batch batch, TextureManager textureManager,
                       Map<BuildingCategory, Building[]> buildingCategoryMap, Unit[] unitTypes) {
+        this.game = game;
         Player[] players = new Player[2];
         players[0] = new Player(HUMAN_PLAYER_ID, Color.BLUE, 1);
         players[1] = new Player(AI_PLAYER_ID, Color.RED, 1);
@@ -215,6 +218,12 @@ public class GameScreen implements Screen {
 
         stateManager.update();
         ai.update();
+
+        for (Player player: stateManager.getPlayers()) {
+            if (!player.isAlive) {
+                game.switchToGameOver(player);
+            }
+        }
     }
 
     @Override

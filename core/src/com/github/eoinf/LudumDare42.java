@@ -2,6 +2,7 @@ package com.github.eoinf;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -12,6 +13,8 @@ import com.github.eoinf.game.Building;
 import com.github.eoinf.game.BuildingEffect;
 import com.github.eoinf.game.Player;
 import com.github.eoinf.game.Unit;
+import com.github.eoinf.screens.gameover.GameOverScreen;
+import com.github.eoinf.screens.title.MainMenuScreen;
 import com.github.eoinf.screens.main.views.GameScreen;
 import com.github.eoinf.screens.main.widgets.BuildingCategory;
 
@@ -20,10 +23,12 @@ import java.util.Map;
 
 public class LudumDare42 extends Game {
     SpriteBatch batch;
-    GameScreen gameScreen;
+    TextureManager textureManager;
 
     private static final int VIEWPORT_WIDTH = 1280;
     private static final int VIEWPORT_HEIGHT = 720;
+    private GameOverScreen gameOverScreen;
+    private MainMenuScreen mainMenuScreen;
 
     @Override
     public void create() {
@@ -31,11 +36,13 @@ public class LudumDare42 extends Game {
         Skin skin = new Skin(f);
         skin.getFont("default-font").getData().setScale(0.5f, 0.5f);
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("textures/game.atlas"));
-        TextureManager textureManager = new TextureManager(atlas, skin);
+        textureManager = new TextureManager(atlas, skin);
         batch = new SpriteBatch();
-        gameScreen = new GameScreen(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, batch, textureManager, getBuildingCategories(),
-                getUnitTypes());
-        setScreen(gameScreen);
+
+        gameOverScreen = new GameOverScreen(this, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, textureManager);
+        mainMenuScreen = new MainMenuScreen(this, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, textureManager);
+
+        setScreen(mainMenuScreen);
     }
 
     @Override
@@ -113,5 +120,20 @@ public class LudumDare42 extends Game {
                 barracks,
         });
         return categoryMap;
+    }
+
+    public void switchToGameOver(Player player) {
+        gameOverScreen.setPlayer(player);
+        setScreen(gameOverScreen);
+    }
+
+    public void switchToMainMenu() {
+        setScreen(mainMenuScreen);
+    }
+
+    public void switchToGame() {
+        Screen gameScreen = new GameScreen(this, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, batch, textureManager, getBuildingCategories(),
+                getUnitTypes());
+        setScreen(gameScreen);
     }
 }

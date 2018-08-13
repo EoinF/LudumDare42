@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.ColorAction;
+import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.RepeatAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -49,9 +50,10 @@ public class PlacedUnitActor extends Group implements PlacedObjectActor {
         float destX = destTile.getX() * gameMap.getTileWidth();
         float destY = destTile.getY() * gameMap.getTileHeight();
         MoveToAction moveThere = Actions.moveTo(destX, destY, 0.8f);
-        MoveToAction moveBack = Actions.moveTo(originX, originY, 0.1f);
+        MoveToAction moveBack = Actions.moveTo(originX, originY);
+        DelayAction delay = Actions.delay(0.5f);
 
-        addAction(forever(sequence(moveThere, moveBack)));
+        addAction(forever(sequence(moveThere, moveBack, delay)));
     }
 
     @Override

@@ -105,6 +105,7 @@ public class StateManager {
                 break;
             case ACTION_PHASE:
                 actionPhase();
+                defeatCheck();
                 gameScreenController.setState(DEPLOYMENT_PHASE);
                 break;
             case DEPLOYMENT_PHASE:
@@ -114,6 +115,21 @@ public class StateManager {
                 productionPhase();
                 gameScreenController.setState(PLANNING_PHASE);
                 break;
+        }
+    }
+
+    private void defeatCheck() {
+        for (Player player: players) {
+            int buildingCount = 0;
+            for (PlacedBuilding building: buildings) {
+                if (building.getOwner() == player.getId()) {
+                    buildingCount++;
+                }
+            }
+
+            if (buildingCount == 0) {
+                player.isAlive = false;
+            }
         }
     }
 

@@ -116,44 +116,46 @@ public class AIController {
 
     private void controlUnits(Random random) {
         for (PlacedUnit unit : units) {
-            PlacedUnit enemy = findNearbyEnemy(unit);
-            if (enemy != null) {
-                unit.setTarget(enemy.getOriginTile());
-            } else {
-                //
-                // Try to siege
-                //
-                if (unit.getOriginTile().getBuilding() != null
-                        && unit.getOriginTile().getBuilding().getOwner() != unit.getOwner()) { // Only enemy buildings
-                    unit.setRazeTarget(unit.getOriginTile().getBuilding());
+            if (unit.getOwner() == player.getId()) {
+                PlacedUnit enemy = findNearbyEnemy(unit);
+                if (enemy != null) {
+                    unit.setTarget(enemy.getOriginTile());
                 } else {
                     //
-                    // Just move the unit
+                    // Try to siege
                     //
-                    int tileX = unit.getOriginTile().getX();
-                    int tileY = unit.getOriginTile().getY();
-
-                    int directionY;
-                    int directionX;
-                    if (tileY > gameMap.getTileOwnedCutoff()) {
-                        directionY = -1;
-                        directionX = random.nextInt(3) - 1;
+                    if (unit.getOriginTile().getBuilding() != null
+                            && unit.getOriginTile().getBuilding().getOwner() != unit.getOwner()) { // Only enemy buildings
+                        unit.setRazeTarget(unit.getOriginTile().getBuilding());
                     } else {
-                        GridPoint2 result = getDirectionToEnemyBuilding(tileX, tileY);
-                        directionX = result.x;
-                        directionY = result.y;
-                    }
+                        //
+                        // Just move the unit
+                        //
+                        int tileX = unit.getOriginTile().getX();
+                        int tileY = unit.getOriginTile().getY();
 
-                    // Try to move there
-
-                    MapTile destTile = gameMap.getTile(tileX + directionX, tileY + directionY);
-                    if (destTile == null) {
-                        destTile = gameMap.getTile(tileX, tileY + directionY);
-                        if (destTile == null) {
-                            destTile = gameMap.getTile(tileX + directionX, tileY);
+                        int directionY;
+                        int directionX;
+                        if (tileY > gameMap.getTileOwnedCutoff()) {
+                            directionY = -1;
+                            directionX = random.nextInt(3) - 1;
+                        } else {
+                            GridPoint2 result = getDirectionToEnemyBuilding(tileX, tileY);
+                            directionX = result.x;
+                            directionY = result.y;
                         }
+
+                        // Try to move there
+
+                        MapTile destTile = gameMap.getTile(tileX + directionX, tileY + directionY);
+                        if (destTile == null) {
+                            destTile = gameMap.getTile(tileX, tileY + directionY);
+                            if (destTile == null) {
+                                destTile = gameMap.getTile(tileX + directionX, tileY);
+                            }
+                        }
+                        unit.setDestinationTile(destTile);
                     }
-                    unit.setDestinationTile(destTile);
                 }
             }
         }
@@ -185,13 +187,15 @@ public class AIController {
         int tileX = unit.getOriginTile().getX();
         int tileY = unit.getOriginTile().getY();
         List<GridPoint2> attackGrid = attackGrids.get(unit.getUnit().getWeapon());
-        for (PlacedUnit otherUnit: units) {
-            if (unit.getOwner() != otherUnit.getOwner()) {
-                int enemyTileX = otherUnit.getOriginTile().getX();
-                int enemyTileY = otherUnit.getOriginTile().getY();
-                for (GridPoint2 point: attackGrid) {
-                    if (tileX + point.x == enemyTileX && tileY + point.y == enemyTileY) {
-                        return otherUnit;
+        if (attackGrid != null) {
+            for (PlacedUnit otherUnit : units) {
+                if (unit.getOwner() != otherUnit.getOwner()) {
+                    int enemyTileX = otherUnit.getOriginTile().getX();
+                    int enemyTileY = otherUnit.getOriginTile().getY();
+                    for (GridPoint2 point : attackGrid) {
+                        if (tileX + point.x == enemyTileX && tileY + point.y == enemyTileY) {
+                            return otherUnit;
+                        }
                     }
                 }
             }

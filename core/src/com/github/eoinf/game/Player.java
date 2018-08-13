@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import java.util.List;
 
 public class Player {
+    public boolean isAlive;
     private int id;
     private Color colour;
 
@@ -38,6 +39,7 @@ public class Player {
         this.soldier = new Resource(0);
         this.metal = new Resource(0);
         this.wood = new Resource(0);
+        this.isAlive = true;
         resetResourceUsage();
     }
 

@@ -79,8 +79,7 @@ public class MainView extends BaseView {
 
                 if (hit instanceof ActionActor) {
                     ((ActionActor) hit).onClick();
-                }
-                else if (hit instanceof PlacedObjectActor) {
+                } else if (hit instanceof PlacedObjectActor) {
                     PlacedObject placedObject = (PlacedObject) hit.getUserObject();
                     if (placedObject.getOwner() == humanPlayer.getId()) {
                         gameScreenController.setSelectedPlacedObject(placedObject);
@@ -107,6 +106,30 @@ public class MainView extends BaseView {
         stage.addListener(new ClickListener(Input.Buttons.RIGHT) {
                               @Override
                               public void clicked(InputEvent event, float x, float y) {
+                                  Actor hit = stage.hit(x, y, false);
+
+                                  if (hit instanceof ActionActor) {
+                                      ((ActionActor) hit).onClick();
+                                  } else if (hit instanceof PlacedObjectActor) {
+                                      PlacedObject placedObject = (PlacedObject) hit.getUserObject();
+                                      if (placedObject.getOwner() == humanPlayer.getId()) {
+                                          gameScreenController.setSelectedPlacedObject(placedObject);
+                                      }
+                                  } else {
+                                      MapObjectBlueprint blueprint = (MapObjectBlueprint) selectedObjectActor.getUserObject();
+                                      if (blueprint != null) {
+                                          if (selectedObjectActor.isValidConstructionSite()) {
+                                              System.out.println("valid construction");
+                                              int tileX = (int) (selectedObjectActor.getX() / gameMap.getTileWidth());
+                                              int tileY = (int) (selectedObjectActor.getY() / gameMap.getTileHeight());
+                                              gameScreenController.placeObject((MapObjectBlueprint) selectedObjectActor.getUserObject(),
+                                                      gameMap.getTile(tileX, tileY), humanPlayer.getId());
+                                          }
+                                      } else {
+                                          gameScreenController.setSelectedPlacedObject(null);
+                                      }
+                                  }
+
                                   gameScreenController.setSelectedObject(null);
                                   super.clicked(event, x, y);
                               }
@@ -176,13 +199,13 @@ public class MainView extends BaseView {
                     PlacedBuilding razedBuilding = (PlacedBuilding) placedObject;
                     int tileX = razedBuilding.getOriginTile().getX();
                     int tileY = razedBuilding.getOriginTile().getY();
-                    for (GridPoint2 offset: razedBuilding.getBuilding().getShape()) {
+                    for (GridPoint2 offset : razedBuilding.getBuilding().getShape()) {
                         gameMap.getTile(tileX + offset.x, tileY + offset.y).setBuilding(null);
                     }
                     selectedObjectActor.removePlacedBuilding(razedBuilding);
                     removeBuilding(razedBuilding);
                 } else {
-                    removeUnit((PlacedUnit)placedObject);
+                    removeUnit((PlacedUnit) placedObject);
                 }
             }
         });
@@ -210,7 +233,7 @@ public class MainView extends BaseView {
 
     public void setBuildings(List<PlacedBuilding> gameBuildings) {
         selectedObjectActor.setPlacedBuildings(gameBuildings);
-        for(PlacedBuilding constructedBuilding: gameBuildings) {
+        for (PlacedBuilding constructedBuilding : gameBuildings) {
             addOrUpdateBuilding(constructedBuilding);
         }
     }
@@ -239,7 +262,7 @@ public class MainView extends BaseView {
     private void addOrUpdateUnit(PlacedUnit placedUnit) {
         removeUnit(placedUnit);
         Player ownerPlayer = null;
-        for (Player player: players) {
+        for (Player player : players) {
             if (player.getId() == placedUnit.getOwner()) {
                 ownerPlayer = player;
             }
@@ -266,8 +289,8 @@ public class MainView extends BaseView {
 
         Vector3 mousePositionInWorld = camera.unproject(mousePositionOnScreen, screenX, screenY,
                 camera.viewportWidth, camera.viewportHeight);
-        int mouseX = (int)mousePositionInWorld.x;
-        int mouseY = (int)mousePositionInWorld.y;
+        int mouseX = (int) mousePositionInWorld.x;
+        int mouseY = (int) mousePositionInWorld.y;
 
         checkCameraInput(delta);
 
