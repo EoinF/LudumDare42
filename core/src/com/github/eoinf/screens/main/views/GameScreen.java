@@ -48,18 +48,51 @@ public class GameScreen implements Screen {
     public GameScreen(int viewportWidth, int viewportHeight, Batch batch, TextureManager textureManager,
                       Map<BuildingCategory, Building[]> buildingCategoryMap, Unit[] unitTypes) {
         Player[] players = new Player[2];
-        players[0] = new Player(HUMAN_PLAYER_ID, Color.BLUE, 1000);
+        players[0] = new Player(HUMAN_PLAYER_ID, Color.BLUE, 1);
         players[1] = new Player(AI_PLAYER_ID, Color.RED, 1);
 
-        List<PlacedBuilding> placedBuildings = new ArrayList<>();
+
+        Building cottageBlueprint = buildingCategoryMap.get(BuildingCategory.HOUSING)[0];
+
         List<PlacedUnit> placedUnits = new ArrayList<>();
 
         GameMap gameMap = new GameMap(32, 25, TILE_WIDTH, TILE_HEIGHT, players);
+
+        int buildingSpawnTileX = gameMap.getWidth() / 2;
+        int buildingSpawnTileY = 3;
+
+        List<PlacedBuilding> placedBuildings = new ArrayList<>();
+
+        PlacedBuilding newBuilding = new PlacedBuilding(
+                cottageBlueprint,
+                gameMap.getTile(buildingSpawnTileX, buildingSpawnTileY),
+                gameMap.getBlueprintTiles(cottageBlueprint, buildingSpawnTileX, buildingSpawnTileY),
+                HUMAN_PLAYER_ID,
+                true
+        );
+        attachBuildingToTiles(gameMap, newBuilding);
+        placedBuildings.add(newBuilding);
+
+        newBuilding = new PlacedBuilding(
+                cottageBlueprint,
+                gameMap.getTile(buildingSpawnTileX, gameMap.getHeight() - buildingSpawnTileY),
+                gameMap.getBlueprintTiles(cottageBlueprint, buildingSpawnTileX, gameMap.getHeight() - buildingSpawnTileY),
+                AI_PLAYER_ID,
+                true
+        );
+        attachBuildingToTiles(gameMap, newBuilding);
+        placedBuildings.add(newBuilding);
+
         this.gameScreenController = new GameScreenController(gameMap, players);
 
         stateManager = new StateManager(players, gameMap, placedBuildings, placedUnits, gameScreenController);
 
-        ai = new AIController(AI_PLAYER_ID, players, placedBuildings, stateManager, gameScreenController);
+        for (Player player: players) {
+            if (player.getId() == AI_PLAYER_ID) {
+                ai = new AIController(player, players, placedBuildings, placedUnits, stateManager, gameScreenController,
+                        buildingCategoryMap, unitTypes, gameMap);
+            }
+        }
 
         createViews(batch, textureManager, viewportWidth, viewportHeight, buildingCategoryMap, unitTypes);
 
@@ -77,7 +110,7 @@ public class GameScreen implements Screen {
 
         this.sidebar.setBuildingTemplates(buildingCategoryMap, TILE_WIDTH, TILE_HEIGHT);
 
-        for (Player player: stateManager.getPlayers()) {
+        for (Player player : stateManager.getPlayers()) {
             if (player.getId() == HUMAN_PLAYER_ID) {
                 this.mainView = new MainView(SIDEBAR_WIDTH, 0, viewportWidth - SIDEBAR_WIDTH, viewportHeight,
                         batch, textureManager, gameScreenController, player);
@@ -98,17 +131,21 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(mux);
     }
 
+    private void attachBuildingToTiles(GameMap gameMap, PlacedBuilding constructedBuilding) {
+        int tileX = constructedBuilding.getOriginTile().getX();
+        int tileY = constructedBuilding.getOriginTile().getY();
+        for (GridPoint2 offset : constructedBuilding.getBuilding().getShape()) {
+            gameMap.getTile(tileX + offset.x, tileY + offset.y).setBuilding(constructedBuilding);
+        }
+    }
+
     private void startGame() {
         gameScreenController.subscribeOnPlaceBuilding(new Consumer<PlacedBuilding>() {
             @Override
             public void accept(PlacedBuilding constructedBuilding) {
-                int tileX = constructedBuilding.getOriginTile().getX();
-                int tileY = constructedBuilding.getOriginTile().getY();
-                for (GridPoint2 offset: constructedBuilding.getBuilding().getShape()) {
-                    stateManager.getMap().getTile(tileX + offset.x, tileY + offset.y).setBuilding(constructedBuilding);
-                }
+                attachBuildingToTiles(stateManager.getMap(), constructedBuilding);
 
-                for (Player player: stateManager.getPlayers()) {
+                for (Player player : stateManager.getPlayers()) {
                     if (constructedBuilding.getOwner() == player.getId()) {
                         player.people.used += constructedBuilding.getBuilding().getPeopleRequired();
                         gameScreenController.changePlayer(player);
@@ -120,7 +157,7 @@ public class GameScreen implements Screen {
         gameScreenController.subscribeOnPlaceUnit(new Consumer<PlacedUnit>() {
             @Override
             public void accept(PlacedUnit placedUnit) {
-                for (Player player: stateManager.getPlayers()) {
+                for (Player player : stateManager.getPlayers()) {
                     if (placedUnit.getOwner() == player.getId()) {
                         player.soldier.used += placedUnit.getUnit().getSoldierCost();
                         player.metal.used += placedUnit.getUnit().getMetalCost();
@@ -137,16 +174,16 @@ public class GameScreen implements Screen {
 
 
     private void spawnTrees() {
-
         int x, y;
 
         Random random = new Random();
-        for (int i = 0; i < 90; i++) {
+        for (int i = 0; i < 200; i++) {
             x = random.nextInt(stateManager.getMap().getWidth());
             y = random.nextInt(stateManager.getMap().getHeight());
             spawnTree(x, y);
         }
     }
+
     boolean spawnTree(int x, int y) {
         final Building tree = new Building("Tree", new GridPoint2[]{new GridPoint2(0, 0)},
                 Building.BuildingType.TREE,
@@ -161,8 +198,7 @@ public class GameScreen implements Screen {
         if (tile.getBuilding() == null) {
             gameScreenController.placeBuilding(tree, tile, -1);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }

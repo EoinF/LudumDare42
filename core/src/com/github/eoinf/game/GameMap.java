@@ -15,6 +15,10 @@ public class GameMap {
 
     private static final int TILE_OWNED_CUTOFF = 10;
 
+    public int getTileOwnedCutoff() {
+        return TILE_OWNED_CUTOFF;
+    }
+
     public GameMap(int width, int height, int tileWidth, int tileHeight, Player[] players) {
         this.players = players;
         this.width = width;

@@ -51,25 +51,25 @@ public class LudumDare42 extends Game {
     }
 
     private Unit[] getUnitTypes() {
-        final String VANDAL_DESCRIPTION = "Cost: 8 soldier";
-        final String ARCHER_DESCRIPTION = "Cost: 20 soldier";
-        final String SWORDSMAN_DESCRIPTION = "Cost: 15 soldier";
+        final String VANDAL_DESCRIPTION = "Cost: 8 soldier (Can only raze buildings)";
+        final String ARCHER_DESCRIPTION = "Cost: 20 soldier (Can attack from a distance)";
+        final String SWORDSMAN_DESCRIPTION = "Cost: 15 soldier (Always attacks before move phase)";
         return new Unit[] {
                 new Unit("Vandal", Unit.WeaponType.NONE, VANDAL_DESCRIPTION,
                         8, 0, 0),
                 new Unit("Swordsman", Unit.WeaponType.SWORD, SWORDSMAN_DESCRIPTION,
-                        20, 0, 0),
+                        15, 0, 0),
                 new Unit("Archer", Unit.WeaponType.BOW_AND_ARROW, ARCHER_DESCRIPTION,
-                        15, 0, 0)
+                        20, 0, 0)
         };
     }
 
     private Map<BuildingCategory, Building[]> getBuildingCategories() {
         Map<BuildingCategory, Building[]> categoryMap = new HashMap<>();
 
-        final String COTTAGE_DESCRIPTION = "+ 1 person rate (Use people to build and to train as soldiers)";
+        final String COTTAGE_DESCRIPTION = "Cost: 1 person (+ 1 person rate; Use people to build and to train as soldiers)";
 
-        final String BARRACKS_DESCRIPTION = "- 2 person rate, + 1 soldier rate (Soldiers can be deployed and roam the map)";
+        final String BARRACKS_DESCRIPTION = "Cost: 5 people (- 2 person rate, + 1 soldier rate; Soldiers can be deployed and roam the map)";
         //
         // Housing
         //

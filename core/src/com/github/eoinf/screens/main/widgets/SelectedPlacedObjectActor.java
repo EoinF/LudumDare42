@@ -29,7 +29,7 @@ public class SelectedPlacedObjectActor extends Group {
         if (object != null) {
             if (object instanceof PlacedBuilding) {
                 SelectedPlacedBuildingActionsGroup group = new SelectedPlacedBuildingActionsGroup((PlacedBuilding) object,
-                        textureManager, gameScreenController);
+                        textureManager, gameScreenController, gameMap);
                 addActor(group);
             }
 

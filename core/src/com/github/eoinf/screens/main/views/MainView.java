@@ -77,13 +77,14 @@ public class MainView extends BaseView {
             public void clicked(InputEvent event, float x, float y) {
                 Actor hit = stage.hit(x, y, false);
 
-                System.out.println(hit);
-                System.out.println(hit instanceof ActionActor);
                 if (hit instanceof ActionActor) {
                     ((ActionActor) hit).onClick();
                 }
                 else if (hit instanceof PlacedObjectActor) {
-                    gameScreenController.setSelectedPlacedObject((PlacedObject) hit.getUserObject());
+                    PlacedObject placedObject = (PlacedObject) hit.getUserObject();
+                    if (placedObject.getOwner() == humanPlayer.getId()) {
+                        gameScreenController.setSelectedPlacedObject(placedObject);
+                    }
                 } else {
                     MapObjectBlueprint blueprint = (MapObjectBlueprint) selectedObjectActor.getUserObject();
                     if (blueprint != null) {
@@ -237,7 +238,13 @@ public class MainView extends BaseView {
 
     private void addOrUpdateUnit(PlacedUnit placedUnit) {
         removeUnit(placedUnit);
-        PlacedUnitActor unitActor = new PlacedUnitActor(textureManager, placedUnit, gameMap, humanPlayer.getColour());
+        Player ownerPlayer = null;
+        for (Player player: players) {
+            if (player.getId() == placedUnit.getOwner()) {
+                ownerPlayer = player;
+            }
+        }
+        PlacedUnitActor unitActor = new PlacedUnitActor(textureManager, placedUnit, gameMap, ownerPlayer.getColour());
         unitActor.setPosition(placedUnit.getOriginTile().getX() * gameMap.getTileWidth(),
                 placedUnit.getOriginTile().getY() * gameMap.getTileHeight());
         unitGroup.addActor(unitActor);

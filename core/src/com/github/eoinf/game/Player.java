@@ -35,7 +35,7 @@ public class Player {
         this.id = id;
         this.colour = colour;
         this.people = new Resource(startingPeople);
-        this.soldier = new Resource(200);
+        this.soldier = new Resource(0);
         this.metal = new Resource(0);
         this.wood = new Resource(0);
         resetResourceUsage();
