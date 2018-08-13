@@ -52,15 +52,15 @@ public class LudumDare42 extends Game {
 
     private Unit[] getUnitTypes() {
         final String VANDAL_DESCRIPTION = "Cost: 8 soldier";
-        final String ARCHER_DESCRIPTION = "Cost: 10 soldier, 4 wood";
-        final String SWORDSMAN_DESCRIPTION = "Cost: 8 soldier, 4 metal";
+        final String ARCHER_DESCRIPTION = "Cost: 20 soldier";
+        final String SWORDSMAN_DESCRIPTION = "Cost: 15 soldier";
         return new Unit[] {
                 new Unit("Vandal", Unit.WeaponType.NONE, VANDAL_DESCRIPTION,
                         8, 0, 0),
                 new Unit("Swordsman", Unit.WeaponType.SWORD, SWORDSMAN_DESCRIPTION,
-                        8, 4, 0),
+                        20, 0, 0),
                 new Unit("Archer", Unit.WeaponType.BOW_AND_ARROW, ARCHER_DESCRIPTION,
-                        10, 0, 4)
+                        15, 0, 0)
         };
     }
 
@@ -68,8 +68,8 @@ public class LudumDare42 extends Game {
         Map<BuildingCategory, Building[]> categoryMap = new HashMap<>();
 
         final String COTTAGE_DESCRIPTION = "+ 1 person rate (Use people to build and to train as soldiers)";
-        final String BARRACKS_DESCRIPTION = "- 2 person rate, + 1 soldier rate (Soldiers can be deployed and roam the map)";
 
+        final String BARRACKS_DESCRIPTION = "- 2 person rate, + 1 soldier rate (Soldiers can be deployed and roam the map)";
         //
         // Housing
         //
@@ -110,7 +110,7 @@ public class LudumDare42 extends Game {
         }, 5);
 
         categoryMap.put(BuildingCategory.MILITARY, new Building[]{
-                barracks
+                barracks,
         });
         return categoryMap;
     }

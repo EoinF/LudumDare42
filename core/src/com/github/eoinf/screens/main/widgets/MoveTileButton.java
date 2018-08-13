@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.github.eoinf.TextureManager;
 
-public class MoveTileButton extends Image implements ActionActor {
+public abstract class MoveTileButton extends Image implements ActionActor {
     private static final Color MOVE_COLOUR = new Color(0, 0.3f, 1, 0.5f);
     MoveTileButton(TextureManager textureManager) {
         super(textureManager.tiles.blank);

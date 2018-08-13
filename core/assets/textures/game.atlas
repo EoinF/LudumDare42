@@ -6,16 +6,23 @@ filter: Nearest,Nearest
 repeat: none
 buildings/barracks
   rotate: false
-  xy: 2, 2
+  xy: 2, 36
   size: 128, 64
   orig: 128, 64
   offset: 0, 0
   index: -1
 buildings/cottage
   rotate: false
-  xy: 132, 2
+  xy: 132, 36
   size: 64, 64
   orig: 64, 64
+  offset: 0, 0
+  index: -1
+buildings/tree
+  rotate: false
+  xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 

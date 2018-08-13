@@ -96,12 +96,18 @@ public class GameScreenController {
                 break;
             }
         }
-        if (gameMap.canConstructBuilding(building, tileX, tileY, owner)
-                && player.canConstructBuilding(building)) {
+        boolean isConstructed = false;
+        if (owner == - 1) {
+            isConstructed = true;
+        }
+
+        if (owner == -1
+                || (gameMap.canConstructBuilding(building, tileX, tileY, owner)
+                    && player.canConstructBuilding(building))) {
             System.out.println("Placing building: " + building.getName() + " at " + tileX + ", " + tileY
                     + " for player " + owner);
             List<MapTile> buildingTiles = gameMap.getBlueprintTiles(building, tileX, tileY);
-            PlacedBuilding placedBuilding = new PlacedBuilding(building, originTile, buildingTiles, owner, false);
+            PlacedBuilding placedBuilding = new PlacedBuilding(building, originTile, buildingTiles, owner, isConstructed);
             for (Consumer<PlacedBuilding> observer : placeBuildingObservers) {
                 observer.accept(placedBuilding);
             }

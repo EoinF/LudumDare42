@@ -16,6 +16,7 @@ public class TextureManager {
 
     private static final String BUILDING_COTTAGE = "buildings/cottage";
     private static final String BUILDING_BARRACKS = "buildings/barracks";
+    private static final String BUILDING_TREE = "buildings/tree";
 
 
     private static final String ICON_BUILDINGS = "ui/iconBuildings";
@@ -52,6 +53,8 @@ public class TextureManager {
                 loadRegion(atlas, BUILDING_COTTAGE));
         buildings.setByType(Building.BuildingType.BARRACKS,
                 loadRegion(atlas, BUILDING_BARRACKS));
+        buildings.setByType(Building.BuildingType.TREE,
+                loadRegion(atlas, BUILDING_TREE));
 
         //
         // UI

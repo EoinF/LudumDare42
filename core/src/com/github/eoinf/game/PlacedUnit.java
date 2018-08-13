@@ -67,4 +67,8 @@ public class PlacedUnit implements PlacedObject{
     public void setAlive(boolean alive) {
         isAlive = alive;
     }
+
+    public void setTarget(MapTile tile) {
+        this.targetTile = tile;
+    }
 }

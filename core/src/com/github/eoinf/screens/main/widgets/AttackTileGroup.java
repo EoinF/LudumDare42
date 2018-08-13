@@ -7,9 +7,8 @@ import com.github.eoinf.game.MapTile;
 import com.github.eoinf.game.PlacedUnit;
 import com.github.eoinf.screens.main.controllers.GameScreenController;
 
-public class MovementTileGroup extends Group {
-    public MovementTileGroup(PlacedUnit placedUnit, TextureManager textureManager, GameMap gameMap,
-                             GameScreenController gameScreenController) {
+public class AttackTileGroup extends Group {
+    public AttackTileGroup(PlacedUnit placedUnit, TextureManager textureManager, GameMap gameMap, GameScreenController gameScreenController) {
         MapTile originTile = placedUnit.getOriginTile();
 
         int tileX = originTile.getX();
@@ -30,7 +29,7 @@ public class MovementTileGroup extends Group {
                 @Override
                 public void onClick() {
                     System.out.println("Click move to tile");
-                    placedUnit.setDestinationTile(destinationTile);
+                    placedUnit.setTarget(destinationTile);
                     gameScreenController.changeUnit(placedUnit);
                     gameScreenController.setSelectedPlacedObject(null);
                 }
@@ -41,3 +40,5 @@ public class MovementTileGroup extends Group {
         }
     }
 }
+
+

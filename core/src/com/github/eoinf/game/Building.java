@@ -48,6 +48,9 @@ public class Building implements MapObjectBlueprint {
 
     public enum BuildingType {
         COTTAGE,
-        BARRACKS
+        BARRACKS,
+        BLACKSMITH,
+        WOODSHOP,
+        TREE
     }
 }

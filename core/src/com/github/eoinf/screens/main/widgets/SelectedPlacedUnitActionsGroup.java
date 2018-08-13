@@ -1,10 +1,7 @@
 package com.github.eoinf.screens.main.widgets;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.PlacedUnit;
@@ -12,27 +9,41 @@ import com.github.eoinf.screens.main.controllers.GameScreenController;
 
 public class SelectedPlacedUnitActionsGroup extends Group {
 
-    public SelectedPlacedUnitActionsGroup (PlacedUnit placedUnit, TextureManager textureManager,
-                                           GameScreenController gameScreenController, GameMap gameMap) {
+    public SelectedPlacedUnitActionsGroup(PlacedUnit placedUnit, TextureManager textureManager,
+                                          GameScreenController gameScreenController, GameMap gameMap) {
         setTransform(false);
+        setTouchable(Touchable.childrenOnly);
         Group actionsGroup = new Group();
+        actionsGroup.setTouchable(Touchable.disabled);
         actionsGroup.setPosition(placedUnit.getOriginTile().getX() * gameMap.getTileWidth(),
                 placedUnit.getOriginTile().getY() * gameMap.getTileHeight() - 32);
 
         addActor(actionsGroup);
 
+        Group reference = this;
+
         if (placedUnit.isDeployed()) {
-            ActionButton moveButton = new ActionButton("Move", textureManager.skin);
-            moveButton.addListener(new ClickListener(Input.Buttons.LEFT) {
+            ActionButton moveButton = new ActionButton("Move", textureManager.skin) {
                 @Override
-                public void clicked(InputEvent event, float x, float y) {
+                public void onClick() {
                     MovementTileGroup movementTileGroup = new MovementTileGroup(placedUnit, textureManager, gameMap,
                             gameScreenController);
-                    addActor(movementTileGroup);
+                    reference.addActor(movementTileGroup);
                     actionsGroup.clearChildren();
                 }
-            });
+            };
             actionsGroup.addActor(moveButton);
+            ActionButton attackButton = new ActionButton("Attack", textureManager.skin) {
+                @Override
+                public void onClick() {
+                    AttackTileGroup attackTileGroup = new AttackTileGroup(placedUnit, textureManager, gameMap,
+                            gameScreenController);
+                    reference.addActor(attackTileGroup);
+                    actionsGroup.clearChildren();
+                }
+            };
+            attackButton.setPosition(64, 0);
+            actionsGroup.addActor(attackButton);
         }
     }
 }

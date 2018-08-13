@@ -162,6 +162,15 @@ public class StateManager {
                 }
             }
         }
+
+        //
+        // Then units die
+        //
+        for (PlacedUnit unit : units) {
+            if (!unit.isAlive()) {
+                gameScreenController.destroyPlacedObject(unit);
+            }
+        }
     }
 
     private void productionPhase() {

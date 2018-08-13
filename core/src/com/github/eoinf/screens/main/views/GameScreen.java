@@ -5,9 +5,12 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.GridPoint2;
 import com.github.eoinf.TextureManager;
 import com.github.eoinf.game.AIController;
 import com.github.eoinf.game.Building;
+import com.github.eoinf.game.BuildingEffect;
+import com.github.eoinf.game.MapTile;
 import com.github.eoinf.game.PlacedBuilding;
 import com.github.eoinf.game.GameMap;
 import com.github.eoinf.game.PlacedUnit;
@@ -20,6 +23,7 @@ import com.github.eoinf.screens.main.widgets.BuildingCategory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Consumer;
 
 public class GameScreen implements Screen {
@@ -121,10 +125,31 @@ public class GameScreen implements Screen {
                 }
             }
         });
+
+        spawnTrees();
     }
 
     private void spawnTrees() {
+        Building tree = new Building("Tree", new GridPoint2[]{new GridPoint2(0, 0)},
+                Building.BuildingType.TREE,
+                new BuildingEffect("") {
+                    @Override
+                    public void applyTo(Player player) {
 
+                    }
+                },
+                4
+        );
+        int x = 0;
+        int y = 0;
+
+        Random random = new Random();
+        for (int i = 0; i < 90; i++) {
+            x = random.nextInt(stateManager.getMap().getWidth());
+            y = random.nextInt(stateManager.getMap().getHeight());
+            MapTile tile = stateManager.getMap().getTile(x, y);
+            gameScreenController.placeBuilding(tree, tile, -1);
+        }
     }
 
     @Override

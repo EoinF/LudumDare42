@@ -18,7 +18,6 @@ import com.github.eoinf.game.PlacedUnit;
 import com.github.eoinf.game.Player;
 import com.github.eoinf.screens.main.controllers.GameScreenController;
 import com.github.eoinf.screens.main.widgets.ActionActor;
-import com.github.eoinf.screens.main.widgets.ActionButton;
 import com.github.eoinf.screens.main.widgets.MapTileActor;
 import com.github.eoinf.screens.main.widgets.PlacedBuildingActor;
 import com.github.eoinf.screens.main.widgets.PlacedObjectActor;
@@ -75,10 +74,12 @@ public class MainView extends BaseView {
         stage.addListener(new ClickListener(Input.Buttons.LEFT) {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Actor hit = stage.hit(x, y, true);
+                Actor hit = stage.hit(x, y, false);
 
+                System.out.println(hit);
+                System.out.println(hit instanceof ActionActor);
                 if (hit instanceof ActionActor) {
-                    // Ignore action actor hits
+                    ((ActionActor) hit).onClick();
                 }
                 else if (hit instanceof PlacedObjectActor) {
                     gameScreenController.setSelectedPlacedObject((PlacedObject) hit.getUserObject());
@@ -96,7 +97,7 @@ public class MainView extends BaseView {
                         gameScreenController.setSelectedPlacedObject(null);
                     }
                 }
-                super.clicked(event, x, y);
+                //super.clicked(event, x, y);
             }
         });
 
@@ -229,7 +230,7 @@ public class MainView extends BaseView {
 
     private void addOrUpdateUnit(PlacedUnit placedUnit) {
         removeUnit(placedUnit);
-        PlacedUnitActor unitActor = new PlacedUnitActor(textureManager, placedUnit, humanPlayer.getColour());
+        PlacedUnitActor unitActor = new PlacedUnitActor(textureManager, placedUnit, gameMap, humanPlayer.getColour());
         unitActor.setPosition(placedUnit.getOriginTile().getX() * gameMap.getTileWidth(),
                 placedUnit.getOriginTile().getY() * gameMap.getTileHeight());
         unitGroup.addActor(unitActor);
