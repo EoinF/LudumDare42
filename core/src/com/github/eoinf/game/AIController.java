@@ -37,6 +37,8 @@ public class AIController {
         this.unitTypes = unitTypes;
         this.gameMap = gameMap;
 
+        this.player.people.total += 5;
+
         gameScreenController.subscribeOnSetState(new Consumer<StateManager.State>() {
             @Override
             public void accept(StateManager.State state) {
@@ -102,7 +104,15 @@ public class AIController {
     }
 
 
+    int turn = 0;
+
     public void update() {
+        if (turn > 40)
+        {
+            this.player.soldier.delta += 1;
+        }
+        turn++;
+        this.player.soldier.delta += 1;
         if (isPlanningPhase && !isTurnEnded) {
             Random random = new Random();
 

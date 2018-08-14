@@ -7,8 +7,8 @@ import com.github.eoinf.LudumDare42;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		TexturePacker.Settings settings = new TexturePacker.Settings();
-		TexturePacker.process(settings, "../../images", "textures", "game");
+//		TexturePacker.Settings settings = new TexturePacker.Settings();
+//		TexturePacker.process(settings, "../../images", "textures", "game");
 
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = 1280;
