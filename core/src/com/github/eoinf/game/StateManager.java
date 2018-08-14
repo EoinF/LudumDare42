@@ -90,6 +90,25 @@ public class StateManager {
                 units.add(placedUnit);
             }
         });
+
+
+        gameScreenController.subscribeOnPlaceBuilding(new Consumer<PlacedBuilding>() {
+            @Override
+            public void accept(PlacedBuilding placedBuilding) {
+                buildings.add(placedBuilding);
+            }
+        });
+
+        gameScreenController.subscribeOnDestroyPlacedObject(new Consumer<PlacedObject>() {
+            @Override
+            public void accept(PlacedObject placedObject) {
+                if (placedObject instanceof PlacedBuilding) {
+                    buildings.remove(placedObject);
+                } else if (placedObject instanceof PlacedUnit) {
+                    units.remove(placedObject);
+                }
+            }
+        });
     }
 
     public void endTurnFor(int playerId) {
@@ -119,10 +138,10 @@ public class StateManager {
     }
 
     private void defeatCheck() {
-        for (Player player: players) {
+        for (Player player : players) {
             int buildingCount = 0;
-            for (PlacedBuilding building: buildings) {
-                if (building.getOwner() == player.getId()) {
+            for (PlacedBuilding building : buildings) {
+                if (building.getOwner() == player.getId() && building.isConstructed()) {
                     buildingCount++;
                 }
             }
@@ -188,15 +207,15 @@ public class StateManager {
         }
 
         // Then position conflicts are checked
-        for (PlacedUnit unit: units) {
-            for (PlacedUnit otherUnit: units) {
+        for (PlacedUnit unit : units) {
+            for (PlacedUnit otherUnit : units) {
                 if (unit.getOwner() != otherUnit.getOwner()
                         && unit.getOriginTile() == otherUnit.getOriginTile()) {
                     int unitStrength = unit.getUnit().getStrength();
                     int otherUnitStrength = otherUnit.getUnit().getStrength();
                     if (unitStrength > otherUnitStrength) {
                         otherUnit.setAlive(false);
-                    } else if (otherUnitStrength > unitStrength){
+                    } else if (otherUnitStrength > unitStrength) {
                         unit.setAlive(false);
                     } else {
                         unit.setAlive(false);
@@ -216,12 +235,12 @@ public class StateManager {
             }
         }
 
-        for (PlacedUnit toRemove: unitsToRemove) {
+        for (PlacedUnit toRemove : unitsToRemove) {
             gameScreenController.destroyPlacedObject(toRemove);
             units.remove(toRemove);
         }
 
-        for (PlacedUnit unit: units) {
+        for (PlacedUnit unit : units) {
             //
             // Then buildings are razed
             //
@@ -233,21 +252,14 @@ public class StateManager {
             unit.resetTargets();
             gameScreenController.changeUnit(unit);
         }
-
     }
 
     private PlacedUnit getTileOccupier(PlacedUnit movingUnit) {
         MapTile destination = movingUnit.getDestinationTile();
         for (PlacedUnit otherUnit : units) {
             if (movingUnit != otherUnit) {
-                if (otherUnit.getDestinationTile() != null) {
-                    if (otherUnit.getDestinationTile() == destination) {
-                        return otherUnit;
-                    }
-                } else {
-                    if (otherUnit.getOriginTile() == destination) {
-                        return otherUnit;
-                    }
+                if (otherUnit.getOriginTile() == destination) {
+                    return otherUnit;
                 }
             }
         }

@@ -126,7 +126,7 @@ public class AIController {
 
     private void controlUnits(Random random) {
         for (PlacedUnit unit : units) {
-            if (unit.getOwner() == player.getId()) {
+            if (unit.getOwner() == player.getId() && unit.isDeployed()) {
                 PlacedUnit enemy = findNearbyEnemy(unit);
                 if (enemy != null) {
                     unit.setTarget(enemy.getOriginTile());
@@ -135,7 +135,8 @@ public class AIController {
                     // Try to siege
                     //
                     if (unit.getOriginTile().getBuilding() != null
-                            && unit.getOriginTile().getBuilding().getOwner() != unit.getOwner()) { // Only enemy buildings
+                            && unit.getOriginTile().getBuilding().getOwner() != unit.getOwner() // Only enemy buildings
+                            && unit.getOriginTile().getBuilding().getBuilding().getType() != Building.BuildingType.TREE) { // Don't raze trees
                         unit.setRazeTarget(unit.getOriginTile().getBuilding());
                     } else {
                         //
@@ -153,10 +154,11 @@ public class AIController {
                             GridPoint2 result = getDirectionToEnemyBuilding(tileX, tileY);
                             directionX = result.x;
                             directionY = result.y;
+
+                            System.out.println(tileX + ", " + tileY + ":" + result);
                         }
 
                         // Try to move there
-
                         MapTile destTile = gameMap.getTile(tileX + directionX, tileY + directionY);
                         if (destTile == null) {
                             destTile = gameMap.getTile(tileX, tileY + directionY);
@@ -173,7 +175,7 @@ public class AIController {
 
     private GridPoint2 getDirectionToEnemyBuilding(int tileX, int tileY) {
         for (PlacedBuilding building: buildings) {
-            if (building.getOwner() != player.getId()) {
+            if (building.getOwner() != player.getId() && building.getBuilding().getType() != Building.BuildingType.TREE) {
                 int directionX = building.getOriginTile().getX() - tileX;
                 int directionY = building.getOriginTile().getY() - tileY;
                 if (directionX > 1) {
